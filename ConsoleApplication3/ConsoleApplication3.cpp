@@ -6,7 +6,7 @@
 #include "Renderer.h"
 #include "Colorinfo.h"
 #include "screenset.h"
-#include <cmath>;
+#include <cmath>
 using namespace Render;
 using namespace Color;
 using namespace std::chrono;
@@ -41,13 +41,13 @@ int main()
 
 	
 	
-	
-	createscreen(screensize.X, screensize.Y, ftsize, &hOut);
+	 createscreen(screensize.X, screensize.Y, ftsize, &hOut);
+
 	 int h=1;
 	 while (true)
 	 {
 
-	
+		
 		 h++;
 		clearscreen();
 		 auto a = high_resolution_clock::now();
