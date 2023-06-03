@@ -22,36 +22,6 @@ namespace drawfunc {
 	static Pallete pallete;
 
 
-	void drawbox(int px, int py, int width, int height,COLORREF pixval) {
-
-
-
-
-
-
-	
-		
-		short voff = (py-(height / 2));
-		short vpff = (py + (height / 2));
-		short hoff = (px - (width / 2));
-		short hpoff = (px + (width / 2));
-		for (short i =  hoff; i < hpoff; i++)
-		{
-			for (short j = voff; j < vpff; j++)
-			{
-  
-				d.setpix(i,  j, pixval);
-			}
-		}
-
-
-
-
-		//std::cout << prevy;
-	}
-
-
-
 	//	d.setpix(px, py, White);
 	//d.setpix(p2x, p2y, Pink);
 
@@ -87,7 +57,7 @@ int main()
 		d.clearscreen();
 		 auto a = high_resolution_clock::now();
 		 d.drawline(2, 2, 33, 4, Red);
-		 drawbox(2, 2, 22,55, Red);
+		 d.drawbox(2, 2, 22,55, Red);
 			 auto b = high_resolution_clock::now();
 			 auto g = duration_cast<nanoseconds>(b - a).count();
 			

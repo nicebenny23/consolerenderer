@@ -26,7 +26,7 @@ namespace Render
 		void setpix(short x, short y, COLORREF col);
 	void clearscreen();
 
-	  
+	void drawbox(int px, int py, int width, int height, COLORREF pixval);
 	void drawline(int px, int py, int p2x, int p2y, COLORREF pixelval);
 	void drawcircle(int px, int py, int radius, COLORREF pixelColor);
 		 COORD GetDim();

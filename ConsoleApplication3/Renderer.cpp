@@ -14,6 +14,44 @@ namespace Render {
 
 		}
 	}
+
+
+
+
+	void Screen::drawbox(int px, int py, int width, int height, COLORREF pixval) {
+
+
+
+
+
+
+
+
+		short voff = (py - (height / 2));
+		short vpff = (py + (height / 2));
+		short hoff = (px - (width / 2));
+		short hpoff = (px + (width / 2));
+		for (short i = hoff; i < hpoff; i++)
+		{
+			for (short j = voff; j < vpff; j++)
+			{
+
+				setpix(i, j, pixval);
+			}
+		}
+
+
+
+
+
+	
+}
+
+
+
+
+
+
 	void Screen::drawcircle(int px, int py, int radius, COLORREF pixelColor) {
 
 
