@@ -6,7 +6,7 @@
 namespace Render
 {
 
-	 static class Screen
+	  class Screen
 	{
 	
 		
@@ -25,7 +25,10 @@ namespace Render
 		void drawframe();
 		void setpix(short x, short y, COLORREF col);
 	void clearscreen();
+
+	  
 	void drawline(int px, int py, int p2x, int p2y, COLORREF pixelval);
+	void drawcircle(int px, int py, int radius, COLORREF pixelColor);
 		 COORD GetDim();
 		
 		

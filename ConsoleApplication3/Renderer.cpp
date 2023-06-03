@@ -14,6 +14,48 @@ namespace Render {
 
 		}
 	}
+	void Screen::drawcircle(int px, int py, int radius, COLORREF pixelColor) {
+
+
+		int prevy = 0;
+		int prevx = -radius;
+		for (int i = 1 - radius; i < floor(-radius / 2); i++)
+		{
+
+			int x = prevx + 1;
+			short y = short(ceil((std::sqrt(float(radius * radius - i * i)))));
+
+
+			drawline(prevx + px, prevy + py, px + x, y + py, pixelColor);
+			drawline(prevx + px, py - prevy, x + px, py - y, pixelColor);
+			drawline(-prevx + px, py - prevy, -x + px, py - y, pixelColor);
+
+			drawline(-prevx + px, py + prevy, -x + px, py + y, pixelColor);
+			drawline(-prevy + px, py + prevx, -y + px, py + x, pixelColor);
+			drawline(prevy + px, py - prevx, y + px, py - x, pixelColor);
+			drawline(prevy + px, py + prevx, y + px, py + x, pixelColor);
+			drawline(-prevy + px, py - prevx, -y + px, py - x, pixelColor);
+			prevx = x;
+			prevy = y;
+
+
+			//d.setpix(val + px, -val1 +py, pixelColor);
+		}
+
+
+
+	}
+
+
+
+
+
+
+
+
+
+
+
 	void Screen::drawline(int px, int py, int p2x, int p2y, COLORREF pixelval) {
 
 
@@ -138,6 +180,15 @@ namespace Render {
 
 	}
 	
+
+
+
+
+
+
+
+
+
 	Screen::Screen(short startwidth, short startheight, COORD fontsize,const HANDLE* hout):pHout(hout)
 		{
 		
