@@ -2,13 +2,72 @@
 #include "Renderer.h"
 #include "Colorinfo.h"
 #include <cmath>
-using namespace Color;
+
 namespace Render {
-	void Screen::setpix(short x, short y, COLORREF col) {
+
+
+	short Width;
+	short Height;
+	short hWidth;
+	short hHeight;
+	COORD Dim;
+
+	CHAR_INFO* pixelarray;
+	const HANDLE* pHout;
+	void createscreen(short startwidth, short startheight, COORD fontsize, const HANDLE* hout)
+	{
+
+	
+
+		 Width = 2 * round(startwidth / (2 * fontsize.X));
+	Height = 2 * round(startheight / (2 * fontsize.Y));
+		 pHout = hout;
+	
+		 hWidth = (Width / 2);
+			hHeight = (Height / 2);
+		 Dim = { Width,Height };
+
+		pixelarray = new CHAR_INFO[Width * Height];
+		clearscreen();
+	}
+
+	void clearscreen() {
+
+
+
+
+
+
+		for (int i = 0; i < Width * Height; i++)
+		{
+			pixelarray[i].Attributes = BLACK;
+
+			pixelarray[i].Char.UnicodeChar = ' ';
+		}
+
+
+	}
+
+	COORD GetDim()
+	{
+		return Dim;
+	}
+
+	void drawframe() {
+
+
+		COORD ScreenBufferCoord = { 0, 0 };
+		SMALL_RECT ConsoleCoord = { 0, 0, Width, Height };
+
+		WriteConsoleOutputA(*pHout, pixelarray, Dim, ScreenBufferCoord, &ConsoleCoord);
+
+	}
+
+	void setpix(short x, short y, COLORREF col) {
 
 		if (abs(x) < hWidth && abs(y) < hHeight) {
 
-			CHAR_INFO* pix = &pixelarray[Width * ((hHeight - (y))) + ((x + hWidth))];
+			CHAR_INFO* pix = &pixelarray[Width * ((hHeight - y)) + ((x + hWidth))];
 			(*pix).Char.UnicodeChar = ' ';
 			(*pix).Attributes = col;
 
@@ -16,9 +75,7 @@ namespace Render {
 	}
 
 
-
-
-	void Screen::drawbox(int px, int py, int width, int height, COLORREF pixval) {
+	void drawbox(short px, short py, int width, int height, COLORREF pixval) {
 
 
 
@@ -27,10 +84,10 @@ namespace Render {
 
 
 
-		short voff = (py - (height / 2));
-		short vpff = (py + (height / 2));
-		short hoff = (px - (width / 2));
-		short hpoff = (px + (width / 2));
+		short voff = (py - (height/2));
+		short vpff = (py + (height/2));
+		short hoff = (px - (width/2));
+		short hpoff = (px + (width/2));
 		for (short i = hoff; i < hpoff; i++)
 		{
 			for (short j = voff; j < vpff; j++)
@@ -52,7 +109,7 @@ namespace Render {
 
 
 
-	void Screen::drawcircle(int px, int py, int radius, COLORREF pixelColor) {
+	void drawcircle(int px, int py, int radius, COLORREF pixelColor) {
 
 
 		int prevy = 0;
@@ -94,7 +151,7 @@ namespace Render {
 
 
 
-	void Screen::drawline(int px, int py, int p2x, int p2y, COLORREF pixelval) {
+	void drawline(int px, int py, int p2x, int p2y, COLORREF pixelval) {
 
 
 		//for vertical line
@@ -227,52 +284,4 @@ namespace Render {
 
 
 
-	Screen::Screen(short startwidth, short startheight, COORD fontsize,const HANDLE* hout):pHout(hout)
-		{
-		
-		
-	
-		Width= 2*round(startwidth/(2*fontsize.X));
-	Height =  2*round(startheight/(2*fontsize.Y));
-		hWidth = (Width / 2);
-		hHeight = (Height / 2);
-		Dim = { Width,Height };
-		
-	  Screen::pixelarray= new CHAR_INFO[Width*Height];
-	   clearscreen();
-			}
-
-	void Screen::clearscreen() {
-
-
-
-		
-	
-
-		for (int i = 0; i < Width * Height; i++)
-		{
-			pixelarray[i].Attributes = BLACK;
-			
-			pixelarray[i].Char.UnicodeChar = ' ';
-		}
-
-
-	}
-	
-	COORD Screen::GetDim()
-	{
-		return Dim;
-	}
-
-	void Screen::drawframe() {
-
-	
-		COORD ScreenBufferCoord = { 0, 0 };
-		SMALL_RECT ConsoleCoord = {0, 0, Width, Height};
-		
-			WriteConsoleOutputA(*pHout, pixelarray, Dim, ScreenBufferCoord, &ConsoleCoord);
-		
-	}
-	
-	
 }

@@ -12,19 +12,6 @@ using namespace Color;
 using namespace std::chrono;
 namespace drawfunc {
 
-	const HANDLE hOut = GetStdHandle(STD_OUTPUT_HANDLE);
-	const HANDLE hIn = GetStdHandle(STD_INPUT_HANDLE);
-	static COORD screensize = { 800,800 };
-	static COORD ftsize = {5,5 };
-	 
-
-	Screen d = Screen(screensize.X, screensize.Y, ftsize, &hOut);
-	static Pallete pallete;
-
-
-	//	d.setpix(px, py, White);
-	//d.setpix(p2x, p2y, Pink);
-
 	
 	
 	
@@ -33,11 +20,19 @@ using namespace Render;
 using namespace drawfunc;
 using namespace std::chrono;
 
-using namespace Color;
+
 using namespace winutil;
 int main()
 {
+	const HANDLE hOut = GetStdHandle(STD_OUTPUT_HANDLE);
+	const HANDLE hIn = GetStdHandle(STD_INPUT_HANDLE);
+	static COORD screensize = { 800,800 };
+	static COORD ftsize = { 2,2 };
+
+
 	
+	static Pallete pallete;
+
 	setmode(hIn);
 	setcursor(hOut);
 	setfont(ftsize, hOut);
@@ -47,22 +42,22 @@ int main()
 	
 	
 	
-	
+	createscreen(screensize.X, screensize.Y, ftsize, &hOut);
 	 int h=1;
 	 while (true)
 	 {
-		
-		d.drawframe();
+
+	
 		 h++;
-		d.clearscreen();
+		clearscreen();
 		 auto a = high_resolution_clock::now();
-		 d.drawline(2, 2, 33, 4, Red);
-		 d.drawbox(2, 2, 22,55, Red);
+		 drawline(2, 2, 33, 4, Red);
+		 drawline(2, 2, 521,511, Blue);
 			 auto b = high_resolution_clock::now();
 			 auto g = duration_cast<nanoseconds>(b - a).count();
 			
 			
-			
+			 drawframe();
 
 		
 		 }
