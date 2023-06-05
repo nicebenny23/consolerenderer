@@ -31,7 +31,7 @@ int main()
 
 
 	
-	static Pallete pallete;
+ 
 
 	setmode(hIn);
 	setcursor(hOut);
@@ -51,8 +51,14 @@ int main()
 		 h++;
 		clearscreen();
 		 auto a = high_resolution_clock::now();
-		 drawline(2, 2, 33, 4, Red);
-		 drawline(2, 2, 521,511, Blue);
+		// drawline(2, 2, 33, 4, Red);
+	//	 drawline(2, 2, 521,511, Blue);
+	//	 drawthickline(2, 2, 44, 434, 2, Red);
+		 drawthickcircle(2, 2, 100, 20, Red);
+		 drawcircle(2, 2, 120, Green);
+		 drawthickline(2,-61,44,102, 4, Blue);
+		 setpix(2, -61,Red);
+		 setpix(44, 102,Red);
 			 auto b = high_resolution_clock::now();
 			 auto g = duration_cast<nanoseconds>(b - a).count();
 			

@@ -43,23 +43,8 @@ namespace Color {
 
 	
 #define BLACK 0
-	const COLORREF PALETTE_GREYSCALE[16] =
-	{
-		BLACK,White,Blue,Brightblue,Green, Lime,Lightblue,Cyan,Red,Pink,Purple,Lightpurple,Clay,Yellow,Tan,White };
 	
-	class Pallete
-	{
-	public:
-		Pallete();
-		uint8_t brighten(uint8_t color);
-		
 
-
-	private:
-
-	
-	};
-	
 	
 
 	
