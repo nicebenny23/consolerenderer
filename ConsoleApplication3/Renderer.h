@@ -1,7 +1,7 @@
 #include <Windows.h>
 #include <stdint.h>
 #include "vector2.h"
-#include "polygon.h"
+
 #ifndef mainren_HPP
 
 #define mainren_HPP
