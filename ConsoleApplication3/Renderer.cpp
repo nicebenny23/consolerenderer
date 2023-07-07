@@ -1,7 +1,7 @@
-﻿#include <Windows.h>
+﻿
 #include "Renderer.h"
 #include "Colorinfo.h"
-#include <cmath>
+
 
 namespace Render {
 
@@ -11,7 +11,7 @@ namespace Render {
 	short hWidth;
 	short hHeight;
 	COORD Dim;
-
+	
 	CHAR_INFO* pixelarray;
 	const HANDLE* pHout;
 	void createscreen(short startwidth, short startheight, COORD fontsize, const HANDLE* hout)
@@ -61,15 +61,15 @@ namespace Render {
 
 		WriteConsoleOutputA(*pHout, pixelarray, Dim, ScreenBufferCoord, &ConsoleCoord);
 
-	}
+                 	}
 
-	void setpix(short x, short y, COLORREF col) {
+void setpix(short x, short y, COLORREF col) {
 
-		if (  abs(x) < hWidth && abs(y) < hHeight) {
+		if (  x < hWidth&& x > -hWidth && y < hHeight && y > -hHeight) {
 
-			CHAR_INFO* pix = &pixelarray[Width * ((hHeight - y)) + ((x + hWidth))];
-			(*pix).Char.UnicodeChar = ' ';
-			(*pix).Attributes = col;
+			CHAR_INFO* pix = &pixelarray[Width * ((hHeight - y)) + x + hWidth];
+			pix->Char.UnicodeChar = ' ';
+			pix->Attributes = col;
 
 		}
 	}
@@ -84,14 +84,14 @@ namespace Render {
 
 
 
+	
 
 
 
 
-
-		short voff = (py - ceil(height/2));
-		short vpff = (py + ceil(height/2));
-		short hoff = (px - ceil(width/2));
+		short voff = (py - floor(height/2));
+		short vpff = (py + floor(height/2));
+		short hoff = (px - floor(width/2));
 		short hpoff = (px + ceil(width/2));
 		for (short i = hoff; i < hpoff; i++)
 		{
@@ -161,302 +161,295 @@ namespace Render {
 
 
 
+	void drawlinet(v2::Vector2 v1, v2::Vector2 v2,int thickness, COLORREF pixelcol) {
+		drawlinet(round(v1.x), round(v1.y), round(v2.x),round( v2.y), thickness, pixelcol);	
+	}
 
-
-
-	void drawline(int px, int py, int p2x, int p2y, COLORREF pixelval) {
-
-
-		//for vertical line
-		if (px - p2x == 0)
-		{
-
-			for (int i = min(py, p2y); i <= max(p2y, py); i++)
-			{
-				setpix(px, i, pixelval);
-			}
-
-			return;
-			//no div by zero
-		}
-
-
-		float slope = (static_cast<float>(p2y) - py) / (p2x - px);
+	void drawline(int x, int y, int x1, int y1, COLORREF pixelcol)
+	{
 		
-		bool uslp = abs(slope) >= 1 ? true : false;
-		int startx, starty, endx, endy;
-
-		float yconst;
-		//make line sorted  by x val and find yconst
-		if (p2x > px) {
-			startx = px;
-			endx = p2x;
-			starty = py;
-			endy = p2y;
-			
-		}
-		else
-		{
-			startx = p2x;
-			endx = px;
-			starty = p2y;
-			endy = py;
+		int dx = abs(x - x1);
+		int sx = x <= x1 ? 1 : -1;
+		int dy = abs(y1 - y);
+		int sy = y <= y1 ? 1 : -1;
 		
-		}
-		yconst = starty - slope * startx;
+		int error = dx - dy;
+
+		for (;;) {
 
 
 
 
-		if (slope > 0)
-		{
-			//positive slope
-
-
-			if (uslp)
-			{
-				//slope greater  than one
-				float x = ((starty - yconst) / slope);
-				for (int i = starty; i <= endy; i++)
-				{
-
-
-
-					//use inverse function to get all the points
-					setpix(round(x + .001), i, pixelval);
-					x += 1 / slope;
-
-				}
+			setpix(x, y, pixelcol);
+			if (x == x1 && y == y1) {
+				return;
 			}
+			int e2 = 2 * error;
+			if (e2 >= -dy) {
 
 
-
-
-			else
-			{
-				//slope less tan one
-
-				float y = slope * startx + yconst;
-				for (int i = startx; i <= endx; i++)
-				{
-					//go from start val and increment slope up to end val
-					setpix(i, std::round(y + .001), pixelval);
-					y += slope;
-
-				}
-
+				error -= dy;
+				x += sx;
 			}
+			if (e2 <= dx) {
 
-
-		}
-
-		else
-		{
-
-
-
-			if (uslp)
-			{
-				float x = (((starty)-yconst) / slope);
-				//goes from start  but since we rely on y and y is going down we will decrement instiad  
-				for (int i = starty;endy <= i; i--)
-				{
-
-					setpix(std::round(x - .001), i, pixelval);
-					//use y val for func instaid of x val but in this case that would lead to going backwords so *-1
-					x -= 1 / slope;
-				}
-			}
-
-
-			else
-			{
-				float y = (slope * (startx)+yconst);
-				for (int i = startx; i <= endx; i++)
-				{
-
-
-					//just normal function same things apply
-
-					setpix(i, std::round(y + .001), pixelval);
-					y += slope;
-
-				}
+				error = error + dx;
+				y += sy;
 
 			}
 		}
-
 
 	}
-	
+	void drawlinet(int x0, int y0, int x1, int y1,float thickness, COLORREF pixelcol)
+	{
 
-
-
-
-
-
-
-
-
-
-
-	void drawthickline(int px, int py, int p2x, int p2y,int thickness, COLORREF pixelval) {
-
-
-		//for vertical line
-		if (px - p2x == 0)
-		{
-
-			for (int i = min(py, p2y); i <= max(p2y, py); i++)
-			{
-				drawbox(px, i,thickness,thickness, pixelval);
-			}
-
-			return;
-			//no div by zero
-		}
-	
-		float slope = (static_cast<float>(p2y) - py) / (p2x - px);
-		int ofsetx = thickness / 2 * sqrt(slope * slope + 1);
-		int ofsety = slope*ofsetx;
-		bool uslp = abs(slope) >= 1 ? true : false;
-		int startx, starty, endx, endy;
+	//dont really understand how this works will learn later
+		 
+		drawthickcircle(x0, y0, thickness, pixelcol);
+		drawthickcircle(x1, y1, thickness, pixelcol);
 		
-		float yconst;
-		//make line sorted  by x val and find yconst
-		if (p2x > px) {
-			startx = px;
-			endx = p2x;
-			starty = py;
-			endy = p2y;
-
-		}
-		else
-		{
-			startx = p2x;
-			endx = px;
-			starty = p2y;
-			endy = py;
-
-		}
-
-		if (uslp)
+		if (x0-x1 == 0 || y0-y1 == 0)
 		{
 
+			if (x0-x1 == 0)
+			{
+				drawbox(x0, ((y0 + y1) / 2),  2*thickness+1, round(abs(y1 - y0)), pixelcol);
+			}
+			else {
+
+				drawbox((x0 + x1) / 2, (y0 + y1) / 2, abs(x1 - x0), 2*thickness, pixelcol);
+
+			}
+			return;
+		}
+
+		
+		int sx = (x1 >= x0) ? 1 : -1;
+		int sy = ((y1 >= y0)) ? 1 : -1;
+		  
+		
+		int p_error = 0;
+		int error = 0;
+		int y = y0;
+		int x = x0;
+		int dx = abs(x1 - x);
+		int dy = abs(y1 - y);
+		int sdx = x1 - x;
+		int sdy = (y1 - y);
+	
+	
+		
+		int dist = sqrt(dx * dx + dy + dy);
+		
+		if (dx>=dy)
+		{
+			 int threshold = dx - 2 * dy;
+			int E_diag = -2 * dx;
+			int E_square = 2 * dy;
+			int length = dx+1;
+			for (int i = 0; i < length; i++)
+			{
+			
+				perpxsub(x, y, sdx, sdy, p_error, thickness, error,pixelcol);
+
+				if (error >= threshold)
+				{
+					y += sy;
+					error = error + E_diag;
+					if (p_error >= threshold)
+					{
+						perpxsub(x, y, sdx, sdy, p_error+E_diag + E_square, thickness, error,pixelcol);
+
+						p_error += E_diag;
+
+					}
+
+					p_error += E_square;
+
+				}
+				error += E_square;
+				x += sx;
+				
+			}
+			
 		}
 		else {
 
-
-		}
-
-
-		if (slope > 0)
-		{
-			//positive slope
 			
-			
-			yconst = starty - slope * startx;
-			if (uslp)
-			{
-				//slope greater  than one
-				
-				
-				float x = ((starty - yconst) / slope);
-				for (int i = starty; i <= endy; i++)
+				int threshold = dy - 2 * dx;
+				int E_diag = -2 * dy;
+				int E_square = 2 * dx;
+				int length = dy+1;
+				for (int i = 0; i < length; i++)
 				{
-
-
-
-					//use inverse function to get all the points
-					for (int j = -thickness/2; j <= thickness/2; j++)
-					{
-						setpix(round(x +j), i, pixelval);
-					}
-				
-					x += 1 / slope;
-
-				}
-			}
-
-
-
-
-			else
-			{
-			
-				
-				//slope less than one
-				yconst = starty - slope * startx;
-
-
-
-			
-				
-				float y = slope * (startx) + yconst;
-				for (int i = startx; i <= endx; i++)
-				{
-					//go from start val and increment slope up to end val
-					for (int j =  - thickness / 2; j <= thickness / 2; j++)
-					{
-
-
-						setpix(i, std::round(y)+j,pixelval);
-					}
-					y +=slope;
-
-				}
-
-			}
-
-
-		}
-
-		else
-		{
-
-		
-
-			if (uslp)
-			{
-				
-			
-				yconst = starty - slope * startx;
-				float x = (((starty)-yconst) / slope);
-				//goes from start  but since we rely on y and y is going down we will decrement instiad  
-				for (int i = starty;endy <= i; i--)
-				{
-					for (int j = -(thickness/2); j <= thickness/2; j++)
-					{
-						setpix(std::round(x)+j, i,pixelval);
-					}
 					
-					//use y val for func instaid of x val but in this case that would lead to going backwords so *-1
-					x -= 1/ slope;
-				}
-			}
+					perpysub(x, y, sdx, sdy, p_error, thickness, error,pixelcol);
 
-
-			else
-			{
-				
-				yconst = starty - slope * startx;
-				float y = (slope * (startx)+yconst);
-				for (int i = startx; i <= endx; i+=1)
-				{
-
-
-					//just normal function same things apply
-					for (int j = -thickness/2; j <= thickness/2; j++)
+					if (error >= threshold)
 					{
-						setpix(i, std::round(y )+j, pixelval);
+						x += sx;
+						error = error + E_diag;
+						if (p_error >= threshold)
+						{
+							perpysub(x, y, sdx, sdy, p_error + E_diag + E_square, thickness, error, pixelcol);
+
+							p_error += E_diag;
+
+						}
+
+						p_error += E_square;
+
 					}
-				
-					y +=slope;
-
+					error += E_square;
+					y += sy;
+					
 				}
-
-			}
+				
+		
 		}
+		//implement check
+		
+	}
+
+	void perpxsub(int x0, int y0, int sdx, int sdy, int einit, int width, int winit,COLORREF pixelcol) {
+
+
+		int dx = abs(sdx);
+		int dy = abs(sdy);
+		int sx = sdx >= 0 ? 1 : -1;
+		int sy = sdy >= 0 ? 1 : -1;
+		int x = x0;
+		int y = y0;
+		int E_diag = -2 * dx;
+		int E_square = 2 * dy;
+		int threshold = dx - 2 * dy;
+		float wthr = 2 *width * sqrt(dx * dx + dy * dy);
+	
+		int error = einit;
+		int tk = dx + dy - winit;
+		while (tk <= wthr)
+		{
+
+
+			setpix(x, y,pixelcol);
+
+			if (error >  threshold)
+			{
+				x -= sx;
+
+				error += E_diag;
+				tk += 2 * dy;
+			}
+
+			error = error + E_square;
+			y += sy;
+			tk += 2 * dx;
+
+		}
+		x = x0;
+		y = y0;
+		error = -einit;
+		tk = dx + dy + winit;
+		while (tk <= wthr)
+		{
+
+
+			setpix(x, y,pixelcol);
+
+			if (error > threshold)
+			{
+				x += sx;
+
+				error += E_diag;
+				tk += 2 * dy;
+			}
+
+			error = error + E_square;
+			y -= sy;
+			tk += 2 * dx;
+
+		}
+	}
+
+
+	void perpysub(int x0, int y0, int sdx, int sdy, int einit, int width, int winit,COLORREF pixelcol) {
+
+
+		int dx = abs(sdx);
+		int dy = abs(sdy);
+		int sx = sdx >= 0 ? 1 :-1;
+		int sy = sdy >= 0 ? 1 : -1;
+		int x = x0;
+		int y = y0;
+		
+		int E_diag = -2 *  dy;
+		int E_square = 2 * dx;
+		int threshold = dy - 2 * dx;
+		float wthr = 2 * width * sqrt(dx * dx + dy * dy);
+		int error = einit;
+		int tk = dx + dy - winit;
+		while (tk <= wthr)
+		{
+
+				setpix(x, y, pixelcol);
+			
+			if (error>threshold)
+			{
+				y-=sy;
+				
+				error += E_diag;
+				tk += 2 * dx;
+			}
+			
+			error = error + E_square;
+				x +=sx;
+				tk += 2 * dy;
+			
+		}
+		x = x0;
+			y=y0;
+		error = -einit;
+		tk = dx + dy + winit;
+		while (tk <= wthr)
+		{
+			
+
+			setpix(x, y, pixelcol);
+
+			if (error > threshold)
+			{
+				y+=sy;
+
+				error += E_diag;
+				tk +=  2 * dx;
+			}
+
+			error = error + E_square;
+			x -=sx;
+			tk += 2 * dy;
+			
+		}
+		
+	}
+		
+	void drawthickcircle(short px, short py, short radius, COLORREF pixelval) {
+		short y = 0;
+		
+		for (int i = - radius; i <=0; i++)
+		{
+			
+			y=short(sqrt(radius * radius - i * i));
+			for (short j = 0; j < y; j++)
+			{
+				setpix(i + px, j + py, pixelval);
+				setpix(-i + px, j + py, pixelval);
+				setpix(i + px, -j + py, pixelval);
+				setpix(-i + px, -j + py, pixelval);
+			}
+			
+		}
+
+
 
 
 	}
@@ -464,34 +457,32 @@ namespace Render {
 
 
 
-
-	void drawthickcircle(int px, int py, int radius,int thickness, COLORREF pixelColor) {
+	void drawthickcircle2(int px, int py, int radius,int thickness, COLORREF pixelColor) {
 
 
 		int prevy = 0;
 		int prevx = -radius;
-		for (int i = 1 - radius; i <= ceil(-radius / 2); i+=1)
+		for (int i = 1 - radius; i < floor(-radius / 2); i++)
 		{
 
 			int x = prevx + 1;
 			short y = short(ceil((std::sqrt(float(radius * radius - i * i)))));
 
+			drawlinet(prevx + px, prevy + py, px + x, y + py,thickness, pixelColor);
+			drawlinet(prevx + px, py - prevy, x + px, py - y,thickness, pixelColor);
+			drawlinet(-prevx + px, py - prevy, -x + px, py - y,thickness, pixelColor);
 
-			drawthickline(prevx + px, prevy + py, px + x, y + py, thickness,pixelColor);
-			drawthickline(prevx + px, py - prevy, x + px, py - y, thickness, pixelColor);
-			drawthickline(-prevx + px, py - prevy, -x + px, py - y, thickness, pixelColor);
-
-			drawthickline(-prevx + px, py + prevy, -x + px, py + y, thickness, pixelColor);
-			drawthickline(-prevy + px, py + prevx, -y + px, py + x, thickness, pixelColor);
-			drawthickline(prevy + px, py - prevx, y + px, py - x, thickness, pixelColor);
-			drawthickline(prevy + px, py + prevx, y + px, py + x, thickness, pixelColor);
-			drawthickline(-prevy + px, py - prevx, -y + px, py - x, thickness, pixelColor);
+			drawlinet(-prevx + px, py + prevy, -x + px, py + y,thickness, pixelColor);
+			drawlinet(-prevy + px, py + prevx, -y + px, py + x,thickness, pixelColor);
+			drawlinet(prevy + px, py - prevx, y + px, py - x,thickness, pixelColor);
+			drawlinet(prevy + px, py + prevx, y + px, py + x,thickness, pixelColor);
+			drawlinet(-prevy + px, py - prevx, -y + px, py - x,thickness, pixelColor);
 			prevx = x;
 			prevy = y;
-
-
+			
 			//d.setpix(val + px, -val1 +py, pixelColor);
 		}
+
 
 
 

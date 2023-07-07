@@ -1,7 +1,7 @@
 #include <Windows.h>
 #ifndef consoleset_HPP
 #define ConsoleSet_HPP
-using namespace Color;
+
 namespace winutil
 {
 	DWORD orginmode;

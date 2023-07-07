@@ -129,12 +129,16 @@
   <ItemGroup>
     <ClCompile Include="Colorinfo.cpp" />
     <ClCompile Include="ConsoleApplication3.cpp" />
+    <ClCompile Include="polygon.cpp" />
     <ClCompile Include="Renderer.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Colorinfo.h" />
+    <ClInclude Include="dynamicarray.h" />
+    <ClInclude Include="polygon.h" />
     <ClInclude Include="screenset.h" />
     <ClInclude Include="Renderer.h" />
+    <ClInclude Include="vector2.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
