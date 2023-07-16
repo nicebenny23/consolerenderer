@@ -1,16 +1,18 @@
 ﻿
 #include "Renderer.h"
 #include "Colorinfo.h"
-
+#include "random.h"
 
 namespace Render {
 
 
-	short Width;
-	short Height;
-	short hWidth;
-	short hHeight;
-	COORD Dim;
+	int  Width;
+	int Height;
+	int hWidth;
+	int hHeight;
+int	cval;//for speed
+v2::Vector2 Dim;
+COORD Dimval;
 	
 	CHAR_INFO* pixelarray;
 	const HANDLE* pHout;
@@ -19,61 +21,74 @@ namespace Render {
 
 	
 
-		 Width = 2 * round(startwidth / (2 * fontsize.X));
-	Height = 2 * round(startheight / (2 * fontsize.Y));
+		 Width = 2 * round(startwidth / (2 * fontsize.X))+1;
+	Height = 2 * round(startheight / (2 * fontsize.Y))+1;
 		 pHout = hout;
-	
+		
 		 hWidth = (Width / 2);
 			hHeight = (Height / 2);
-		 Dim = { Width,Height };
-
+		 Dim = v2::Vector2(0,0);
+		 Dimval = { short(Width),short(Height) };
+		
 		pixelarray = new CHAR_INFO[Width * Height];
 		clearscreen();
+		cval= (Width * hHeight) + hWidth;
 	}
 
-	void clearscreen() {
 
 
 
 
-
-
-		for (int i = 0; i < Width * Height; i++)
-		{
-			pixelarray[i].Attributes = BLACK;
-
-			pixelarray[i].Char.UnicodeChar = ' ';
+	//safe method to set pix
+	void setpix(const int x, const int y, DWORD col) {
+		
+		
+		if (y <= hHeight && y >= -hHeight&&  x <= hWidth&& x >= -hWidth) {
+			pixelarray[-(Width * y)+x+cval ].Attributes =col;
+			
 		}
-
-
 	}
 
-	COORD GetDim()
+
+
+
+//unsafe method to set pix but 2 times faster
+void unsafesetpix(int x, int y, DWORD col) {
+		pixelarray[-(Width * y) + x + cval].Attributes = col;
+}
+
+void clearscreen() {
+
+
+
+
+
+
+	for (int i = 0; i < Width * Height; i++)
 	{
-		return Dim;
+		
+		pixelarray[i].Attributes = 0;
+
+		pixelarray[i].Char.UnicodeChar = ' ';
 	}
 
-	void drawframe() {
+
+}
+void drawframe() {
 
 
-		COORD ScreenBufferCoord = { 0, 0 };
-		SMALL_RECT ConsoleCoord = { 0, 0, Width, Height };
+	COORD ScreenBufferCoord = { 0, 0 };
+	SMALL_RECT ConsoleCoord = { 0, 0, Width, Height };
 
-		WriteConsoleOutputA(*pHout, pixelarray, Dim, ScreenBufferCoord, &ConsoleCoord);
+	WriteConsoleOutputA(*pHout, pixelarray, Dimval, ScreenBufferCoord, &ConsoleCoord);
 
-                 	}
+ }
 
-void setpix(short x, short y, COLORREF col) {
 
-		if (  x < hWidth&& x > -hWidth && y < hHeight && y > -hHeight) {
-
-			CHAR_INFO* pix = &pixelarray[Width * ((hHeight - y)) + x + hWidth];
-			pix->Char.UnicodeChar = ' ';
-			pix->Attributes = col;
-
-		}
-	}
-
+v2::Vector2 GetDim()
+{
+	return Dim;
+}
 
 
 
@@ -125,7 +140,7 @@ void setpix(short x, short y, COLORREF col) {
 			int x = prevx + 1;
 			short y = short(ceil((std::sqrt(float(radius * radius - i * i)))));
 
-
+			//revered x,y,and -x,-y
 			drawline(prevx + px, prevy + py, px + x, y + py, pixelColor);
 			drawline(prevx + px, py - prevy, x + px, py - y, pixelColor);
 			drawline(-prevx + px, py - prevy, -x + px, py - y, pixelColor);
@@ -164,6 +179,137 @@ void setpix(short x, short y, COLORREF col) {
 	void drawlinet(v2::Vector2 v1, v2::Vector2 v2,int thickness, COLORREF pixelcol) {
 		drawlinet(round(v1.x), round(v1.y), round(v2.x),round( v2.y), thickness, pixelcol);	
 	}
+	void drawtriangle(triangle tri)
+	{
+		Vector2 carry= Vector2(0,0);
+		if (tri[1].y> tri[2].y)
+		{
+			carry = tri[1];
+			tri[1] = tri[2];
+			tri[2] = carry;
+		}
+		if (tri[0].y > tri[2].y)
+		{
+			carry = tri[0];
+			tri[0] = tri[2];
+			tri[2] = carry;
+		}
+		if (tri[0].y > tri[1].y)
+		{
+			carry = tri[0];
+			tri[0] = tri[1];
+			tri[1] = carry;
+		}
+		int x3 = 0;
+		int y3 = 0;
+		
+		bool cm1=true;//canmove1
+		int x = round(tri[0].x);//
+		int y = round(tri[0].y);
+		int x1 = round(tri[1].x);//const
+		int y1 = round(tri[1].y);//const
+	
+		int dx = abs(x - x1);//dx for first one
+		int sx = x <= x1 ? 1 : -1;//sign of x
+		//no sign of y as we sorted   
+		int dy = abs(y1 - y);
+		
+		int error = dx - dy;
+
+
+		bool cm2 = true;
+		int x12 = round(tri[0].x);
+		int y12 = round(tri[0].y);
+		int x2 = round(tri[2].x);
+		int y2 = round(tri[2].y);
+		int dx2 = abs(x12 - x2);
+		int sx2 = x12 <= x2 ? 1 : -1;
+		int dy2 = abs(y12 - y2);
+	
+		int error2 = dx2 - dy2;
+
+		
+		bool sef = false;//special end flag
+		
+		while (true) {
+			if (cm1) {
+				if (x == x1 && y == y1) {
+					sef = true;
+					return;
+
+				}  
+				int e2 = 2 * error;
+				if (e2 >= -dy) {
+
+
+					error -= dy;
+					x += sx;
+				}
+				if (e2 <= dx) {
+
+					error = error + dx;
+					y += 1;
+					cm1 = false;
+				}
+				
+			}
+
+
+			if (cm2) {
+				
+				int e2 = 2 * error2;
+				if (e2 >= -dy2) {
+
+
+					error2 -= dy2;
+					x12 += sx2;
+				}
+				if (e2 <= dx2) {
+
+					error2 += dx2;
+					y12 += 1;
+					cm2 = false;
+
+				}
+			}
+			if (!cm1 && !cm2 || sef) {
+				if (x < x12) {
+					for (int i = x; i <= x12; i++)
+					{
+						setpix(i, y12, 160);
+						setpix(i, y, 160);
+					}
+				}
+				else
+				{
+
+					for (int i = x12; i <= x; i++)
+					{
+						setpix(i, y12, 160);
+						setpix(i, y, 160);
+					}
+
+				}
+
+				if (sef)
+				{
+					int x1 = round(tri[2].x);//const
+					int y1 = round(tri[1].y);//const
+
+					int x2 = round(tri[2].x);//const
+					int y2 = round(tri[1].y);//const
+					int dx2 = abs(x12 - x2);
+					int sx2 = x12 <= x2 ? 1 : -1;
+					int dy2 = abs(y12 - y2);
+
+
+				}
+				cm1 = true;
+				cm2 = true;
+			}
+		}
+		
+	}
 
 	void drawline(int x, int y, int x1, int y1, COLORREF pixelcol)
 	{
@@ -175,11 +321,7 @@ void setpix(short x, short y, COLORREF col) {
 		
 		int error = dx - dy;
 
-		for (;;) {
-
-
-
-
+		while(true) {
 			setpix(x, y, pixelcol);
 			if (x == x1 && y == y1) {
 				return;
@@ -213,7 +355,7 @@ void setpix(short x, short y, COLORREF col) {
 
 			if (x0-x1 == 0)
 			{
-				drawbox(x0, ((y0 + y1) / 2),  2*thickness+1, round(abs(y1 - y0)), pixelcol);
+				drawbox(x0, ((y0 + y1) / 2),  2*thickness, (abs(y1 - y0)), pixelcol);
 			}
 			else {
 
@@ -314,15 +456,16 @@ void setpix(short x, short y, COLORREF col) {
 	void perpxsub(int x0, int y0, int sdx, int sdy, int einit, int width, int winit,COLORREF pixelcol) {
 
 
-		int dx = abs(sdx);
-		int dy = abs(sdy);
-		int sx = sdx >= 0 ? 1 : -1;
+		const short dx = abs(sdx);
+	const	short dy = abs(sdy);
+		short sx = sdx >= 0 ? 1 : -1;
 		int sy = sdy >= 0 ? 1 : -1;
 		int x = x0;
 		int y = y0;
-		int E_diag = -2 * dx;
-		int E_square = 2 * dy;
-		int threshold = dx - 2 * dy;
+		const short  E_diag = -2 * dx;
+		const short E_square = 2 * dy;
+		const short tdx = 2 * dx;
+		const short threshold = dx - 2 * dy;
 		float wthr = 2 *width * sqrt(dx * dx + dy * dy);
 	
 		int error = einit;
@@ -338,12 +481,12 @@ void setpix(short x, short y, COLORREF col) {
 				x -= sx;
 
 				error += E_diag;
-				tk += 2 * dy;
+				tk +=  E_square;
 			}
 
-			error = error + E_square;
+			error += E_square;
 			y += sy;
-			tk += 2 * dx;
+			tk += tdx;
 
 		}
 		x = x0;
@@ -361,12 +504,12 @@ void setpix(short x, short y, COLORREF col) {
 				x += sx;
 
 				error += E_diag;
-				tk += 2 * dy;
+				tk += E_square;
 			}
 
 			error = error + E_square;
 			y -= sy;
-			tk += 2 * dx;
+			tk +=tdx;
 
 		}
 	}
@@ -375,16 +518,17 @@ void setpix(short x, short y, COLORREF col) {
 	void perpysub(int x0, int y0, int sdx, int sdy, int einit, int width, int winit,COLORREF pixelcol) {
 
 
-		int dx = abs(sdx);
-		int dy = abs(sdy);
-		int sx = sdx >= 0 ? 1 :-1;
-		int sy = sdy >= 0 ? 1 : -1;
+		short dx = abs(sdx);
+		short dy = abs(sdy);
+		short sx = sdx >= 0 ? 1 :-1;
+		short sy = sdy >= 0 ? 1 : -1;
 		int x = x0;
 		int y = y0;
 		
-		int E_diag = -2 *  dy;
-		int E_square = 2 * dx;
-		int threshold = dy - 2 * dx;
+		const short E_diag = -2 * dy;
+			const short tdy = 2 * dy;
+		const short E_square = 2 * dx;
+		const short threshold = dy - 2 * dx;
 		float wthr = 2 * width * sqrt(dx * dx + dy * dy);
 		int error = einit;
 		int tk = dx + dy - winit;
@@ -398,12 +542,12 @@ void setpix(short x, short y, COLORREF col) {
 				y-=sy;
 				
 				error += E_diag;
-				tk += 2 * dx;
+				tk += E_square;
 			}
 			
 			error = error + E_square;
 				x +=sx;
-				tk += 2 * dy;
+				tk += tdy;
 			
 		}
 		x = x0;
@@ -421,12 +565,12 @@ void setpix(short x, short y, COLORREF col) {
 				y+=sy;
 
 				error += E_diag;
-				tk +=  2 * dx;
+				tk += E_square;
 			}
 
 			error = error + E_square;
 			x -=sx;
-			tk += 2 * dy;
+			tk += tdy;
 			
 		}
 		
@@ -441,6 +585,7 @@ void setpix(short x, short y, COLORREF col) {
 			y=short(sqrt(radius * radius - i * i));
 			for (short j = 0; j < y; j++)
 			{
+				//all j and i signs combinations
 				setpix(i + px, j + py, pixelval);
 				setpix(-i + px, j + py, pixelval);
 				setpix(i + px, -j + py, pixelval);

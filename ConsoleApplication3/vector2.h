@@ -1,5 +1,6 @@
 #include <cmath>
 #include <Windows.h>
+
 #ifndef v2_HPP
 #define v2_HPP
 
@@ -42,7 +43,11 @@ namespace v2
 
 const  Vector2 zerov = Vector2(0, 0);
 
+inline Vector2 Coordtovector(COORD pos) {
 
+
+	return Vector2(pos.X,  -pos.Y);
+}
 inline Vector2::Vector2() {
 
 
@@ -100,7 +105,7 @@ inline Vector2::Vector2() {
 	inline Vector2 Vector2::operator+(const Vector2& p1) const {
 
 
-		return Vector2(x + p1.x, y + p1.x);
+		return Vector2(x + p1.x, y + p1.y);
 
 
 	}
@@ -120,7 +125,7 @@ inline Vector2::Vector2() {
 	inline Vector2 Vector2::operator-(const Vector2& p1) const {
 
 
-		return Vector2(x - p1.x, y - p1.x);
+		return Vector2(x - p1.x, y - p1.y);
 
 
 	}

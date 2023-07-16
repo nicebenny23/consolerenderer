@@ -27,6 +27,12 @@
     <ClCompile Include="polygon.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="userinput.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="random.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Renderer.h">
@@ -45,6 +51,27 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="polygon.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="userinput.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="inpututil.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="boxflt.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="triangle.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="random.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="safearray.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="transfom.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
