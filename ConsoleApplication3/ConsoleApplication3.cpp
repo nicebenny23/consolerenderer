@@ -58,7 +58,7 @@ triangle tri = triangle(morb);
 	 int th = 1;
 	 init();
 	 while (true)
-	 {
+	 {  
 		
 		userinput::getinput(hIn);
 		clearscreen();
