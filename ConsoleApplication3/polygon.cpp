@@ -5,7 +5,7 @@
 
 Vector2 pgon::centerofmass(polygon poly)
 {
-	if (poly.pointlist.length==0)
+	/*if (poly.pointlist.length == 0)
 	{
 		return Vector2(0, 0);
 
@@ -26,7 +26,14 @@ Vector2 pgon::centerofmass(polygon poly)
 			xval += conval * (poly.pointlist[i].x + poly.pointlist[i + 1].x);
 			yval += conval * (poly.pointlist[i].y + poly.pointlist[i + 1].y);
 	}
-	return Vector2(xval, yval) / (6*area);
+	return Vector2(xval, yval) / (6*area);\
+	*/
+	Vector2 total = Vector2();
+	for (int i = 0; i < poly.pointlist.length; i++)
+	{
+		total+= poly.pointlist[i];
+	}
+	return total / poly.pointlist.length;
 }
 
 pgon::polygon::polygon() {
@@ -76,5 +83,12 @@ void pgon::polygon::drawout(int thickness,COLORREF pixelvalue)
 	}
 
 	Render::drawlinet(pointlist[pointlist.length - 1]+polypos, pointlist[0]+polypos, thickness, pixelvalue);
+	Vector2 comm = centerofmass(*this);
+	for (int i = 0; i < pointlist.length-1; i++)
+	{
+		Vector2 list[3] = { pointlist[i]+ polypos, pointlist[i + 1]+ polypos, comm+polypos };
+		triangle tri = triangle::triangle(list);
+		Render::drawtriangle(tri, pixelvalue);
 
+	}
 }

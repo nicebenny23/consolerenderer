@@ -40,7 +40,7 @@ COORD Dimval;
 
 
 	//safe method to set pix
-	void setpix(const int x, const int y, DWORD col) {
+inline	void setpix(const int x, const int y, DWORD col) {
 		
 		
 		if (y <= hHeight && y >= -hHeight&&  x <= hWidth&& x >= -hWidth) {
@@ -179,7 +179,7 @@ v2::Vector2 GetDim()
 	void drawlinet(v2::Vector2 v1, v2::Vector2 v2,int thickness, COLORREF pixelcol) {
 		drawlinet(round(v1.x), round(v1.y), round(v2.x),round( v2.y), thickness, pixelcol);	
 	}
-	void drawtriangle(triangle tri)
+	void drawtriangle(triangle tri,DWORD col)
 	{
 		Vector2 carry= Vector2(0,0);
 		if (tri[1].y> tri[2].y)
@@ -200,14 +200,14 @@ v2::Vector2 GetDim()
 			tri[0] = tri[1];
 			tri[1] = carry;
 		}
-		int x3 = 0;
-		int y3 = 0;
-		
+		int x3 =(tri[2].x);
+		int y3 = (tri[2].y);
+		bool firsttri = true;
 		bool cm1=true;//canmove1
-		int x = round(tri[0].x);//
-		int y = round(tri[0].y);
-		int x1 = round(tri[1].x);//const
-		int y1 = round(tri[1].y);//const
+		int x = (tri[0].x);//
+		int y = (tri[0].y);
+		int x1 = (tri[1].x);//const
+		int y1 =(tri[1].y);//const
 	
 		int dx = abs(x - x1);//dx for first one
 		int sx = x <= x1 ? 1 : -1;//sign of x
@@ -218,10 +218,10 @@ v2::Vector2 GetDim()
 
 
 		bool cm2 = true;
-		int x12 = round(tri[0].x);
-		int y12 = round(tri[0].y);
-		int x2 = round(tri[2].x);
-		int y2 = round(tri[2].y);
+		int x12 = (tri[0].x);
+		int y12 = (tri[0].y);
+		int x2 = (tri[2].x);
+		int y2 = (tri[2].y);
 		int dx2 = abs(x12 - x2);
 		int sx2 = x12 <= x2 ? 1 : -1;
 		int dy2 = abs(y12 - y2);
@@ -233,10 +233,14 @@ v2::Vector2 GetDim()
 		
 		while (true) {
 			if (cm1) {
+				if (y == y1  &&x == x1&&sef) {
+
+					return;
+				}
+
 				if (x == x1 && y == y1) {
 					sef = true;
-					return;
-
+					cm1 = false;
 				}  
 				int e2 = 2 * error;
 				if (e2 >= -dy) {
@@ -251,7 +255,10 @@ v2::Vector2 GetDim()
 					y += 1;
 					cm1 = false;
 				}
-				
+				if (x == x1 && y == y1) {
+					sef = true;
+					cm1 = false;
+				}
 			}
 
 
@@ -272,12 +279,12 @@ v2::Vector2 GetDim()
 
 				}
 			}
-			if (!cm1 && !cm2 || sef) {
+			if (!cm1 && !cm2 ) {
 				if (x < x12) {
 					for (int i = x; i <= x12; i++)
 					{
-						setpix(i, y12, 160);
-						setpix(i, y, 160);
+						setpix(i, y12, col);
+						
 					}
 				}
 				else
@@ -285,23 +292,24 @@ v2::Vector2 GetDim()
 
 					for (int i = x12; i <= x; i++)
 					{
-						setpix(i, y12, 160);
-						setpix(i, y, 160);
+						setpix(i, y12, col);
+						
 					}
 
 				}
 
-				if (sef)
+				if (sef&&firsttri)
 				{
-					int x1 = round(tri[2].x);//const
-					int y1 = round(tri[1].y);//const
+				x1 =(tri[2].x);//const
+					y1 = (tri[2].y);//const
 
-					int x2 = round(tri[2].x);//const
-					int y2 = round(tri[1].y);//const
-					int dx2 = abs(x12 - x2);
-					int sx2 = x12 <= x2 ? 1 : -1;
-					int dy2 = abs(y12 - y2);
+					dx = abs(x - x1);//dx for first one
+					sx = x <= x1 ? 1 : -1;//sign of x
+					//no sign of y as we sorted   
+					dy = abs(y1 - y);
 
+					 error = dx - dy;
+					firsttri = false;
 
 				}
 				cm1 = true;
@@ -328,13 +336,10 @@ v2::Vector2 GetDim()
 			}
 			int e2 = 2 * error;
 			if (e2 >= -dy) {
-
-
 				error -= dy;
 				x += sx;
 			}
 			if (e2 <= dx) {
-
 				error = error + dx;
 				y += sy;
 

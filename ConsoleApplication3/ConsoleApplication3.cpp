@@ -43,9 +43,9 @@ int main()
 	polygon pg = polygon();
 	createscreen(screensize.X, screensize.Y, ftsize, &hOut);
 	pg.pointlist.append(Vector2(-44, -84));
-	pg.append(Vector2(4, -44));
-	pg.pointlist.append(Vector2(124, 55));
-	pg.pointlist.append(Vector2(1, 1));
+	pg.append(Vector2(4, -144));
+	pg.pointlist.append(Vector2(60, 55));
+	pg.pointlist.append(Vector2(1, 166));
 	Vector2 morb[3] = { Vector2(-22, -22), Vector2(33, 33), Vector2(354,54) };
 
 triangle tri = triangle(morb);
@@ -79,7 +79,7 @@ triangle tri = triangle(morb);
 		// drawline(2, 2, 33, 4, Red);
 	
 		//drawlinet(22, 22, 33, 44,44, Green);
-			drawtriangle(tri);
+		
 			
 		 auto a = high_resolution_clock::now();
 		 if (randombool()) {
@@ -91,12 +91,14 @@ triangle tri = triangle(morb);
 			 }
 			 float ga = 0;
 		 }
+		 pg.drawout(5,128);
 			int l = random() * 15;
 			tri[2] = userinput::mousestate.pos;
-			pg.polypos = userinput::mousestate.pos;
+			pg.polypos = userinput::mousestate.pos-polymass;
 		//	pg.drawout(4, 16);
 		//	drawbox(polymass.x, polymass.y, 22, 22, 240);
 			 auto b = high_resolution_clock::now();
+
 			 auto g = duration_cast<nanoseconds>(b - a).count();
 			 t += g / static_cast<float>(1'000'000);
 			 drawframe();
