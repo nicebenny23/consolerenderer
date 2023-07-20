@@ -181,6 +181,7 @@ v2::Vector2 GetDim()
 	}
 	void drawtriangle(triangle tri,DWORD col)
 	{
+		
 		Vector2 carry= Vector2(0,0);
 		if (tri[1].y> tri[2].y)
 		{
@@ -242,7 +243,7 @@ v2::Vector2 GetDim()
 					sef = true;
 					cm1 = false;
 				}  
-				int e2 = 2 * error;
+				int e2 = error*2;
 				if (e2 >= -dy) {
 
 
@@ -264,7 +265,7 @@ v2::Vector2 GetDim()
 
 			if (cm2) {
 				
-				int e2 = 2 * error2;
+				int e2 = error2*2;
 				if (e2 >= -dy2) {
 
 

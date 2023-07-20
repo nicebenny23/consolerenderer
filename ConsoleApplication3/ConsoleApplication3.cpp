@@ -42,10 +42,12 @@ int main()
 
 	polygon pg = polygon();
 	createscreen(screensize.X, screensize.Y, ftsize, &hOut);
-	pg.pointlist.append(Vector2(-44, -84));
-	pg.append(Vector2(4, -144));
+	pg.pointlist.append(Vector2(-94, -84));
+	
 	pg.pointlist.append(Vector2(60, 55));
 	pg.pointlist.append(Vector2(1, 166));
+	pg.append(Vector2(-133, -22));
+
 	Vector2 morb[3] = { Vector2(-22, -22), Vector2(33, 33), Vector2(354,54) };
 
 triangle tri = triangle(morb);
@@ -69,7 +71,7 @@ triangle tri = triangle(morb);
 			pg.pointlist.deleteind(pg.pointlist.length-1);
 		}
 		Vector2 polymass = pgon::centerofmass(pg);
-		pg.pointlist[0] = polymass;
+		
 
 		//drawthickcircle2(0, 0, 55, th ,Blue);
 	//	drawbox(round(userinput::mousestate.pos.x),round( userinput::mousestate.pos.y), 4, 41, col(6));
@@ -80,29 +82,45 @@ triangle tri = triangle(morb);
 	
 		//drawlinet(22, 22, 33, 44,44, Green);
 		
-			
 		 auto a = high_resolution_clock::now();
-		 if (randombool()) {
-			 for (int i = 0; i < 8; i++)
-			 {
-
-				
-
-			 }
-			 float ga = 0;
-		 }
-		 pg.drawout(5,128);
+		
+		
 			int l = random() * 15;
 			tri[2] = userinput::mousestate.pos;
-			pg.polypos = userinput::mousestate.pos-polymass;
-		//	pg.drawout(4, 16);
+			
+				pg.drawout(1, 128);
+			
+		
 		//	drawbox(polymass.x, polymass.y, 22, 22, 240);
 			 auto b = high_resolution_clock::now();
 
 			 auto g = duration_cast<nanoseconds>(b - a).count();
 			 t += g / static_cast<float>(1'000'000);
+			 for (int i = -200; i < 200; i++) {
+				 for (int j = -200; j < 200; j++) {
+					 if (pointinpolygon(Vector2(i, j), pg))
+					 {
+						 setpix(i, j, 162);
+					 }
+
+				 }
+
+			 }
+			 pg.drawout(4, 16);
+			 if (leftofline(userinput::mousestate.pos,Vector2(0,0),Vector2(-100,100)))
+			 {
+				
+			 }
+			// drawlinet(Vector2(0, 0), Vector2(-100, 100), 4, 120);
+			 for (int i = 0; i < pg.pointlist.length; i++)
+			 {
+				 drawbox(pg[i].x, pg[i].y, 22, 22, 240);
+
+			 }
 			 drawframe();
 			 userinput::resetkeys();
+
+			
 		 }
 	 
 	

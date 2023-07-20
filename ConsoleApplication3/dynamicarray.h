@@ -109,6 +109,7 @@ namespace dynamicarray {
 			return;
 		}
 
+
 		for (int i = 0; i < length; i++) {
 			list[i] = arr.list[i];
 		}
@@ -259,13 +260,13 @@ namespace dynamicarray {
 
 				return false;
 			}
-		//	if (size > capacity && size > length) {
+			
 				for (int i = 0; i < length; i++)
 				{
 
 					newlist[i] = list[i];
 				}
-			//}
+			
 			//also the error here is a bug 
 
 

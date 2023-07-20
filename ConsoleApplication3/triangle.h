@@ -11,6 +11,7 @@ public:
 	Vector2& operator[](int index);
 	Vector2 vertices[3];
 	triangle(Vector2 trilist[3]);
+	triangle(Vector2 a,Vector2 b,Vector2 c);
 	triangle();
 	void changetriangle(int index, Vector2 point);
  
@@ -38,6 +39,13 @@ inline triangle::triangle(Vector2 trilist[3])
 	
 
 
+}
+inline triangle::triangle(Vector2 a, Vector2 b, Vector2 c)
+{
+
+	vertices[0] = a;
+	vertices[1] = b;
+	vertices[2] = c;
 }
 inline triangle::triangle()
 {

@@ -99,6 +99,7 @@
     <ClInclude Include="dynamicarray.h" />
     <ClInclude Include="inpututil.h" />
     <ClInclude Include="polygon.h" />
+    <ClInclude Include="quack.h" />
     <ClInclude Include="random.h" />
     <ClInclude Include="safearray.h" />
     <ClInclude Include="screenset.h" />

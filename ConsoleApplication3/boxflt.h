@@ -49,7 +49,7 @@ inline void resizeif(v2::Vector2 point, box &boundbox) {
 inline bool pointinbox(v2::Vector2 point, box boundbox) {
 
 
-	if (boundbox.startpoint.x<=point.x&&point.x <= boundbox.endpoint.x && boundbox.startpoint.y <= point.y<= boundbox.endpoint.y)
+	if (boundbox.startpoint.x<=point.x&&point.x <= boundbox.endpoint.x && boundbox.startpoint.y <= point.y&&point.y<= boundbox.endpoint.y)
 	{
 		return true;
 	}
