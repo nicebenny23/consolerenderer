@@ -16,7 +16,7 @@ namespace Render
 		const extern HANDLE* pHout;
 	
 
-		void drawtriangle(triangle tri);
+		void drawtriangle(triangle tri,DWORD col);
 		void createscreen(short startwidth, short startheight, COORD fontsize, const HANDLE* hout);
 		void drawframe();
 		void setpix(int x, int	y, DWORD col);

@@ -159,7 +159,92 @@ inline Vector2::Vector2() {
 
 		return Vector2(x / scale, y / scale);
 	}
+	inline bool leftofline(Vector2 point, Vector2 start, Vector2 end) {
 
+		if (start.y==end.y)
+		{
+			return false;
+
+		}
+		if (point.y <= max(start.y, end.y) && point.y >= min(start.y, end.y)) {
+
+			float lerpval = (point.y - end.y) / (start.y - end.y);
+
+			if (lerpval*start.x+(1-lerpval)*end.x<=point.x)
+			{
+				return true;
+			}
+		}
+		return false;
+	}
+	inline bool badleftofline(Vector2 P0, Vector2 P1, Vector2 P2)
+	{
+		if (((P1.x - P0.x) * (P2.y - P0.y) - (P2.x - P0.x) * (P1.y - P0.y))
+			> 0)
+		{
+			return true;
+		}
+		return false;
+	}
+
+	inline bool badrightofline(Vector2 P0, Vector2 P1, Vector2 P2) {
+
+
+		if (((P1.x - P0.x) * (P2.y - P0.y) - (P2.x - P0.x) * (P1.y - P0.y))
+			< 0)
+		{
+			return true;
+		}
+		return false;
+	}
+	inline bool rightofline(Vector2 point, Vector2 start, Vector2 end) {
+
+		if (start.y == end.y)
+		{
+			return false;
+
+		}
+		if (point.y <= max(start.y, end.y) && point.y >= min(start.y, end.y)) {
+
+			float lerpval = (point.y - end.y) / (start.y - end.y);
+
+			if (lerpval * start.x + (1 - lerpval) * end.x >= point.x)
+			{
+				return true;
+			}
+		}
+		return false;
+	}
+	//inline bool lineintersection(Vector2 start1 Vector2 end1,Vector2 start2,Vector2 end2 ) {
+
+
+	//	if (point.y < max(start.y, end.y) && point.y >= min(start.y, end.y)) {
+
+		//	float lerpval = (point.y - end.y) / (start.y - end.y);
+
+			//if (lerpval * start.x + (1 - lerpval) * end.x > point.x)
+			//{
+			//	return true;
+			//}
+		///}
+		//return false;
+	//}
+	inline bool lineinter(Vector2 a, Vector2 b, Vector2 c, Vector2 d) {
+	
+		if (a.x < b.x) {
+
+			if (rightofline(b, c, d) && leftofline(a, c, d)) {
+				return true;
+			}
+		}
+		else
+		{
+			if (rightofline(a, c, d) && leftofline(b, c, d)) {
+				return true;
+			}
+		}
+		return false;
+	}
 	inline Vector2& Vector2::operator/=(float scale) {
 
 

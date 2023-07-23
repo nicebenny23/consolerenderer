@@ -17,16 +17,20 @@ namespace pgon{
 		
 		polygon();
 		polygon(Vector2* listofpoints,int length);
-		array<triangle> triangulate;
+		
 		Vector2 polypos;
 		array<Vector2> pointlist;
 		box boundingbox;
+		Vector2 operator[](int index);
+
 		void drawout(int thickness,COLORREF pixelval);
 	};
+	array<triangle> triangulate(polygon poly);
+	bool pointinpolygon(Vector2 point, polygon poly);
 	float area(polygon poly);
 	Vector2 centerofmass(polygon poly);
-
-
+	bool lineinpolygon(polygon poly,Vector2 start,Vector2 end);
+	
 
 }
 
