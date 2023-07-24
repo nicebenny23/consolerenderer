@@ -1,8 +1,29 @@
 #include "polygon.h"
 #include "Renderer.h"
 #include "boxflt.h"
+#include "edge.h"
+using namespace line;
+struct trapst
+{
 
 
+
+	Vector2 upperv;
+	Vector2 lowerv;
+
+
+	
+	trapst* trapup1;
+	trapst* trapup2;
+	trapst* trapup3;
+	bool trapup3left;
+
+	trapst* trapdown1;
+	trapst* trapdown2;
+
+	bool state;
+
+};
 Vector2 pgon::centerofmass(polygon poly)
 {
 	/*if (poly.pointlist.length == 0)
@@ -41,7 +62,7 @@ bool pgon::lineinpolygon(polygon poly, Vector2 start, Vector2 end)
 
 	if (pointinpolygon(start,poly)&&pointinpolygon(end,poly))
 	{
-
+		
 		for (int i = 0; i < poly.pointlist.length-1; i++) {
 
 
@@ -50,7 +71,7 @@ bool pgon::lineinpolygon(polygon poly, Vector2 start, Vector2 end)
 				return false;
 			}
 		}
-		if (lineinter(start, end, poly[poly.pointlist.length-1], poly[0])|| !pointinpolygon((start + end) / 2, poly))
+		if (!pointinpolygon((start + end) / 2, poly))
 		{
 			return false;
 		}
@@ -90,7 +111,18 @@ void pgon::polygon::append(v2::Vector2 val) {
 }
 bool pgon::pointinpolygon(Vector2 point, polygon poly)
 {
-	
+
+
+
+	bool parity = false;
+
+	for (int i = 0; i < poly.pointlist.length - 1; i++) {
+		parity ^= v2::leftofline(point, poly.pointlist[i], poly.pointlist[i + 1]);
+	}
+	parity ^= v2::leftofline(point, poly.pointlist[0], poly.pointlist[poly.pointlist.length - 1]);
+
+	return parity;
+	/*
 	short wind = 0;
 
 
@@ -110,7 +142,7 @@ bool pgon::pointinpolygon(Vector2 point, polygon poly)
 		}
 		else
 		{
-		
+
 				if ( poly[(i + 1) % poly.pointlist.length].y<=point.y)
 				{
 					if (badrightofline(point, poly[i], poly[(i + 1) % (poly.pointlist.length)]))
@@ -119,19 +151,14 @@ bool pgon::pointinpolygon(Vector2 point, polygon poly)
 					}
 				}
 
-			
+
 		}
 	}
 	return wind !=0;
-	/*bool parity = false;
-
-	for (int i = 0; i < poly.pointlist.length - 1; i++) {
-			parity^= v2::leftofline(point, poly.pointlist[i], poly.pointlist[i + 1]);	
-	}
-		parity ^= v2::leftofline(point, poly.pointlist[0], poly.pointlist[poly.pointlist.length - 1]);
-	
-	return parity;
 	*/
+
+
+	
 }
 float pgon::area(polygon poly) {
 //uses shoelase formula

@@ -97,6 +97,7 @@
     <ClInclude Include="boxflt.h" />
     <ClInclude Include="Colorinfo.h" />
     <ClInclude Include="dynamicarray.h" />
+    <ClInclude Include="edge.h" />
     <ClInclude Include="inpututil.h" />
     <ClInclude Include="polygon.h" />
     <ClInclude Include="quack.h" />

@@ -85,7 +85,7 @@ inline Vector2::Vector2() {
 
 	}
 
-	inline float slope(const Vector2& p, const Vector2& p1, float t) {
+	inline float slope(const Vector2& p, const Vector2& p1) {
 		return (p1.y-p.y)/(p1.x-p.x);
 
 
@@ -230,21 +230,66 @@ inline Vector2::Vector2() {
 		//return false;
 	//}
 	inline bool lineinter(Vector2 a, Vector2 b, Vector2 c, Vector2 d) {
+		
+		float dy = (a.y - b.y);
 	
-		if (a.x < b.x) {
+		float dy1 =(c.y - d.y);
+		if (dy == 0) {
 
-			if (rightofline(b, c, d) && leftofline(a, c, d)) {
-				return true;
+
+			
+			
+			return false;
+
 			}
-		}
-		else
+		if (dy1==0)
 		{
-			if (rightofline(a, c, d) && leftofline(b, c, d)) {
+
+
+
+			return false;
+
+		}
+		float dx = (a.x - b.x);
+
+		float dx1 = (c.x - d.x);
+		
+
+		if (dx==dx1)
+		{
+
+
+			if (a==c||b==c||a==d||b==d)
+			{
 				return true;
 			}
+			return false;
 		}
+
+		float s = dy / dx;
+		float s1 = dy1 / dx1;
+		float yc = a.y - a.x * s;
+		float yc1 = c.y - c.x * s1;
+
+		float x = (yc1 - yc) / (s - s1);
+		Vector2 point = Vector2(x, x * s + yc);
+
+		
+		if (point.x< max(a.x, b.x)&& point.x >min(a.x, b.x))
+		{
+			if (point.x< max(d.x, c.x) && point.x >min(c.x, d.x))
+			{
+				return true;
+			}
+
+
+		}
+
 		return false;
-	}
+		}
+
+
+
 	inline Vector2& Vector2::operator/=(float scale) {
 
 
