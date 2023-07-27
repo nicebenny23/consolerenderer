@@ -17,7 +17,7 @@ namespace Color {
 		{
 			return (240);
 		}
-		return (16 * brightness);
+		return (brightness<<4);
 	}
 
 	inline DWORD invcol(int brightness)

@@ -1,9 +1,10 @@
-#include <iomanip>
-#include <iostream>
-#include <stdexcept>
+
+#include "dynamicarray.h"
+
 #ifndef safearray_HPP
 #define safearray_HPP
 
+using namespace dynamicarray;
 namespace saferarray {
 
 
@@ -14,9 +15,11 @@ namespace saferarray {
 		safearray(int size);
 		safearray(const T* arr,int len);
 		T& operator[](int index);
+		
 		~safearray();
 		T* getdata();
-		safearray(const safearray& arr);
+		safearray(const array<T> arr);
+		safearray(const safearray<T>& arr);
 		int length;
 		
 	private:
@@ -27,8 +30,8 @@ namespace saferarray {
 	};
 
 
-
-
+	template<class T>
+	safearray<T> tosafe(array<T> dynamic);
 	
 
 
@@ -47,9 +50,26 @@ namespace saferarray {
 	}
 
 	template<class T>
-	safearray<T>::safearray(const safearray& arr) {
+	safearray<T>::safearray(const safearray<T>& arr) {
 		length = arr.length;
 		
+		list = new T[length];
+		if (list == nullptr)
+		{
+			delete[] list;
+
+			return;
+		}
+
+		for (int i = 0; i < length; i++) {
+			list[i] = arr.list[i];
+		}
+
+	}
+	template<class T>
+	safearray<T>::safearray(const array<T> arr) {
+		length = arr.length;
+
 		list = new T[length];
 		if (list == nullptr)
 		{
@@ -126,6 +146,13 @@ namespace saferarray {
 
 
 
+
+	template<class T>
+	safearray<T> tosafe(array<T> dynamic)
+	{
+		safearray<T> array = safearray(dynamic);
+		return array;
+	}
 
 }
 #endif

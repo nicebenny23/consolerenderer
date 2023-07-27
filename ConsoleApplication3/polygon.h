@@ -25,6 +25,8 @@ namespace pgon{
 
 		void drawout(int thickness,COLORREF pixelval);
 	};
+
+	array<triangle> fasttriangulate(polygon poly);
 	array<triangle> triangulate(polygon poly);
 	bool pointinpolygon(Vector2 point, polygon poly);
 	float area(polygon poly);

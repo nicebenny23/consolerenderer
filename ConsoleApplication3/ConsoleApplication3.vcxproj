@@ -91,12 +91,15 @@
     <ClCompile Include="polygon.cpp" />
     <ClCompile Include="random.cpp" />
     <ClCompile Include="Renderer.cpp" />
+    <ClCompile Include="sprite.cpp" />
     <ClCompile Include="userinput.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="boxflt.h" />
+    <ClInclude Include="btree.h" />
     <ClInclude Include="Colorinfo.h" />
     <ClInclude Include="dynamicarray.h" />
+    <ClInclude Include="edge.h" />
     <ClInclude Include="inpututil.h" />
     <ClInclude Include="polygon.h" />
     <ClInclude Include="quack.h" />
@@ -104,8 +107,10 @@
     <ClInclude Include="safearray.h" />
     <ClInclude Include="screenset.h" />
     <ClInclude Include="Renderer.h" />
+    <ClInclude Include="sprite.h" />
     <ClInclude Include="transfom.h" />
     <ClInclude Include="triangle.h" />
+    <ClInclude Include="triangulate.h" />
     <ClInclude Include="userinput.h" />
     <ClInclude Include="vector2.h" />
   </ItemGroup>

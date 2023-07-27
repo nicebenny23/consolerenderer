@@ -1,6 +1,7 @@
 #include <iomanip>
 #include <iostream>
 #include <stdexcept>
+
 #ifndef dynamicarray_HPP
 #define dynamicarray_HPP
 
@@ -11,6 +12,7 @@ namespace dynamicarray {
 	class array
 	{
 	public:
+	
 		array();
 		T& operator[](int index);
 		T getelem(int index);
@@ -131,6 +133,9 @@ namespace dynamicarray {
 
 		if (index < length && index >= 0)//sees if in bounds
 		{
+			
+				return false;
+			
 			length--;//decrements size
 			for (int i = index; i < length; i++)
 			{
@@ -296,7 +301,9 @@ namespace dynamicarray {
 	}
 
 
-		template<class T>
+	
+
+	template<class T>
 		array<T>::array() {
 			length = 0;
 			capacity = 1;

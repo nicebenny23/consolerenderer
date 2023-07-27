@@ -243,7 +243,7 @@ v2::Vector2 GetDim()
 					sef = true;
 					cm1 = false;
 				}  
-				int e2 = error*2;
+				int e2 = error<<1;
 				if (e2 >= -dy) {
 
 

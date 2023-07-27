@@ -1,5 +1,5 @@
 #include "random.h"
-#include <random>
+
 
 uint64_t val = 0;
 float   random()
@@ -31,7 +31,45 @@ float random(float max)
 
     return max*static_cast<double>(val) / UINT64_MAX;
 }
+template <typename T>
+T multidist(safearray<float> probdist, safearray<T> returnval)
+{
 
+    float total = 0;
+
+    for (int i = 0; i <probdist.length; i++)
+    {
+        total += probdist[i];
+    }
+        float rand = float(random()) * total - probdist[0];
+
+
+        short g = 0;
+
+        while (rand > 0)
+        {
+            rand -= probdist[++g];
+        }
+
+        return(returnval[ g]);
+
+
+  
+}
+bool randombool(float truechance) {
+
+
+    if (random(100)<=truechance)
+    {
+        return true;
+    }
+    return false;
+}
+int randomint(float max)
+{
+
+    return round(random(max)-.5);
+}
 void init()
 {
 

@@ -8,7 +8,7 @@ namespace v2
 {
 	struct Vector2
 	{
-		
+
 		Vector2(float X, float Y);
 		Vector2();
 		void operator=(const Vector2& p1);
@@ -16,7 +16,7 @@ namespace v2
 		bool operator!=(const Vector2& p1);
 		Vector2& operator+=(const Vector2& p1);
 		Vector2 operator+(const Vector2& p1) const;
-	
+
 		Vector2& operator-=(const Vector2& p1);
 		Vector2 operator-(const Vector2& p1) const;
 
@@ -25,74 +25,83 @@ namespace v2
 
 
 		Vector2 operator/(float scale) const;
-		
+
 		Vector2& operator/=(float scale);
-	
+
 		Vector2 operator*(Vector2& scale) const;
 		Vector2& operator*=(Vector2& scale);
 
 		Vector2 operator/(Vector2& scale) const;
 		Vector2& operator/=(Vector2& scale);
-	
+
 		float x;
 		float y;
 
 
-		
+
 	};
 
-const  Vector2 zerov = Vector2(0, 0);
+	const  Vector2 zerov = Vector2(0, 0);
 
-inline Vector2 Coordtovector(COORD pos) {
-
-
-	return Vector2(pos.X,  -pos.Y);
-}
-inline Vector2::Vector2() {
+	inline Vector2 Coordtovector(COORD pos) {
 
 
+		return Vector2(pos.X, -pos.Y);
+	}
+	inline Vector2::Vector2() {
 
-	x = 0;
-	y = 0;
-}
-	
-	inline float distance(const Vector2& p,const Vector2& p1){
+
+
+		x = 0;
+		y = 0;
+	}
+
+	inline float distance(const Vector2& p, const Vector2& p1) {
 
 		return(sqrt((p.x - p1.x) * (p.x - p1.x) + (p.y - p1.y) * (p.y - p1.y)));
 	}
 
-	
+	inline Vector2 rotpnt( Vector2 p, const Vector2 p1,float degrees) {
+
+		float c = cos(degrees);
+		float s = sin(degrees);
+		p-=p1;
+
+
+		p = Vector2(p.x * c - p.y * s, p.x * s + p.y * c);
+		return (p + p1);
+	}
 
 	inline float magnitude(const Vector2& p) {
 
-		return(sqrt(p.x*p.x + p.y*p.y));
+		return(sqrt(p.x * p.x + p.y * p.y));
 	}
 
-	inline Vector2 normal (const Vector2& p) {
+	inline Vector2 normal(const Vector2& p) {
 
-		return(p/magnitude(p));
+		return(p / magnitude(p));
 	}
 
 	inline float dotproduct(const Vector2& p, const Vector2& p1) {
 
-		return (p.x*p1.x+p.y+p1.y);
+		return (p.x * p1.x + p.y + p1.y);
 	}
 
 
-	inline Vector2 lerp(const Vector2& p, const Vector2& p1,float t) {
-		return p* (1-t) + p1 * t;
+	inline Vector2 lerp(const Vector2& p, const Vector2& p1, float t) {
+		return p * (1 - t) + p1 * t;
 
 
 	}
 
-	inline float slope(const Vector2& p, const Vector2& p1, float t) {
-		return (p1.y-p.y)/(p1.x-p.x);
+	inline float slope(const Vector2& p, const Vector2& p1) {
+		return (p1.y - p.y) / (p1.x - p.x);
 
 
 	}
 
 	inline void Vector2::operator=(const Vector2& p1) {
-	
+
 		x = p1.x;
 		y = p1.y;
 
@@ -117,11 +126,11 @@ inline Vector2::Vector2() {
 		return *this;
 
 	}
-	
-	
 
 
-	
+
+
+
 	inline Vector2 Vector2::operator-(const Vector2& p1) const {
 
 
@@ -137,7 +146,7 @@ inline Vector2::Vector2() {
 		return *this;
 
 	}
-	
+
 	inline Vector2 Vector2::operator*(float scale) const {
 
 		return Vector2(x * scale, y * scale);
@@ -161,7 +170,7 @@ inline Vector2::Vector2() {
 	}
 	inline bool leftofline(Vector2 point, Vector2 start, Vector2 end) {
 
-		if (start.y==end.y)
+		if (start.y == end.y)
 		{
 			return false;
 
@@ -170,20 +179,24 @@ inline Vector2::Vector2() {
 
 			float lerpval = (point.y - end.y) / (start.y - end.y);
 
-			if (lerpval*start.x+(1-lerpval)*end.x<=point.x)
+			if (lerpval * start.x + (1 - lerpval) * end.x <= point.x)
 			{
 				return true;
 			}
 		}
 		return false;
 	}
-	inline bool badleftofline(Vector2 P0, Vector2 P1, Vector2 P2)
+	inline bool badleftofline(Vector2 point,Vector2 start, Vector2 end)
 	{
-		if (((P1.x - P0.x) * (P2.y - P0.y) - (P2.x - P0.x) * (P1.y - P0.y))
-			> 0)
-		{
-			return true;
-		}
+		
+		
+			float lerpval = (point.y - end.y) / (start.y - end.y);
+
+			if (lerpval * start.x + (1 - lerpval) * end.x <= point.x)
+			{
+				return true;
+			}
+		
 		return false;
 	}
 
@@ -230,21 +243,92 @@ inline Vector2::Vector2() {
 		//return false;
 	//}
 	inline bool lineinter(Vector2 a, Vector2 b, Vector2 c, Vector2 d) {
-	
-		if (a.x < b.x) {
 
-			if (rightofline(b, c, d) && leftofline(a, c, d)) {
-				return true;
-			}
+		float dy = (a.y - b.y);
+
+		float dy1 = (c.y - d.y);
+		if (dy == 0) {
+
+
+
+
+			return false;
+
 		}
-		else
+		if (dy1 == 0)
 		{
-			if (rightofline(a, c, d) && leftofline(b, c, d)) {
+
+
+
+			return false;
+
+		}
+		float dx = (a.x - b.x);
+
+		float dx1 = (c.x - d.x);
+
+
+		if (dx == dx1)
+		{
+
+
+			if (a == c || b == c || a == d || b == d)
+			{
 				return true;
 			}
+			return false;
 		}
+
+		float s = dy / dx;
+		float s1 = dy1 / dx1;
+		float yc = a.y - a.x * s;
+		float yc1 = c.y - c.x * s1;
+
+		float x = (yc1 - yc) / (s - s1);
+		Vector2 point = Vector2(x, x * s + yc);
+
+
+		if (point.x< max(a.x, b.x) && point.x >min(a.x, b.x))
+		{
+			if (point.x< max(d.x, c.x) && point.x >min(c.x, d.x))
+			{
+				return true;
+			}
+
+
+		}
+
 		return false;
 	}
+
+	
+	inline bool horozontalray(Vector2 a, Vector2 c, Vector2 d, Vector2* loc) {
+
+
+		if (a==c||a==d)
+		{
+			return false;
+
+		}
+		if (a.y < max(c.y, d.y)&&a.y>min(c.y,d.y))
+		{
+			float lerpval = (a.y - d.y) / (c.y - d.y);
+
+		*loc=c*lerpval+d* (1 - lerpval);
+			
+				return true;
+			
+
+		}
+
+		
+		return false;
+		
+
+	}
+
+
+
 	inline Vector2& Vector2::operator/=(float scale) {
 
 
@@ -255,25 +339,25 @@ inline Vector2::Vector2() {
 	}
 
 
-	inline Vector2 Vector2::operator*(Vector2 &scale) const {
+	inline Vector2 Vector2::operator*(Vector2& scale) const {
 
 		return Vector2(x * scale.x, y * scale.y);
 	}
 
 
-	inline Vector2& Vector2::operator*=(Vector2 &scale) {
+	inline Vector2& Vector2::operator*=(Vector2& scale) {
 		x *= scale.x;
 		y *= scale.y;
 		return *this;
 	}
 
-	inline Vector2 Vector2::operator/(Vector2 &scale) const {
+	inline Vector2 Vector2::operator/(Vector2& scale) const {
 
 		return Vector2(x / scale.x, y / scale.y);
 	}
 
 
-	inline Vector2& Vector2::operator/=(Vector2 &scale) {
+	inline Vector2& Vector2::operator/=(Vector2& scale) {
 
 
 		x /= scale.x;
@@ -291,12 +375,12 @@ inline Vector2::Vector2() {
 	inline bool Vector2::operator==(const Vector2& p1)
 	{
 		return (p1.x == x && p1.y == y);
-		
+
 	}
 	inline bool Vector2::operator!=(const Vector2& p1)
 	{
 		return(p1.x != x || p1.y != y);
-		
+
 	}
 }
 #endif

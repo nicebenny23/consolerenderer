@@ -1,5 +1,5 @@
   #include <string>
-
+#include "btree.h"
 #include <iostream>
 
 #include <chrono>
@@ -9,6 +9,7 @@
 #include "Colorinfo.h"
 #include "dynamicarray.h"
 #include "polygon.h"
+#include "sprite.h"
 #include "userinput.h"
 #include "random.h"
 using namespace Render;
@@ -19,6 +20,7 @@ using namespace dynamicarray;
 using namespace winutil;
 using namespace pgon;
 using namespace v2;
+
 int main()
 {
 	srand((unsigned)(time)(0));
@@ -43,11 +45,12 @@ int main()
 	polygon pg = polygon();
 	createscreen(screensize.X, screensize.Y, ftsize, &hOut);
 	pg.pointlist.append(Vector2(-94, -84));
+	pg.append(Vector2(-133, -22));
+	pg.pointlist.append(Vector2(1, 166));
 	
 	pg.pointlist.append(Vector2(60, 55));
-	pg.pointlist.append(Vector2(1, 166));
-	pg.append(Vector2(-133, -22));
-
+	pg.append(Vector2(3, -44));
+	sprite::spritec fa = sprite::spritec("fprintf.txt",Vector2(0,0));
 	Vector2 morb[3] = { Vector2(-22, -22), Vector2(33, 33), Vector2(354,54) };
 
 triangle tri = triangle(morb);
@@ -57,6 +60,7 @@ triangle tri = triangle(morb);
 	 float t=1;
 	 int g = 1;
 	 int p = 1;
+	 
 	 int th = 1;
 	 init();
 	 while (true)
@@ -69,6 +73,11 @@ triangle tri = triangle(morb);
 		if (userinput::Getkey('r').held)
 		{
 			pg.pointlist.deleteind(pg.pointlist.length-1);
+		}
+
+		if (userinput::Getkey('a').held)
+		{
+			pg.pointlist[3] += v2::Vector2(0, 11);
 		}
 		Vector2 polymass = pgon::centerofmass(pg);
 		
@@ -85,38 +94,27 @@ triangle tri = triangle(morb);
 		 auto a = high_resolution_clock::now();
 		
 		
-			int l = random() * 15;
-			tri[2] = userinput::mousestate.pos;
 			
-				pg.drawout(1, 128);
 			
-		
+				//pg.drawout(1, 128);
+			
+		fa.drawtoscreen( true);
+		fa.posscale = Vector2(20, 20);
 		//	drawbox(polymass.x, polymass.y, 22, 22, 240);
 			 auto b = high_resolution_clock::now();
 
 			 auto g = duration_cast<nanoseconds>(b - a).count();
-			 t += g / static_cast<float>(1'000'000);
-			 for (int i = -200; i < 200; i++) {
-				 for (int j = -200; j < 200; j++) {
-					 if (pointinpolygon(Vector2(i, j), pg))
-					 {
-						 setpix(i, j, 162);
-					 }
-
-				 }
-
-			 }
-			 pg.drawout(4, 16);
+			 t += g / static_cast<float>(1'00'000);
+			
+			// pg.drawout(4, 16);
 			 if (leftofline(userinput::mousestate.pos,Vector2(0,0),Vector2(-100,100)))
 			 {
 				
 			 }
 			// drawlinet(Vector2(0, 0), Vector2(-100, 100), 4, 120);
-			 for (int i = 0; i < pg.pointlist.length; i++)
-			 {
-				 drawbox(pg[i].x, pg[i].y, 22, 22, 240);
-
-			 }
+		
+			
+			
 			 drawframe();
 			 userinput::resetkeys();
 
