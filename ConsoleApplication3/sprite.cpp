@@ -158,6 +158,9 @@ short* sprite::scale(spritefile sprit, Vector2 scale,bool mode)
                 double c2 = sprit.bufdat[x1 +xdm] * (1 - dy);
                 double c3 = sprit.bufdat[x1 + xdmp] * (dy);
              
+
+
+
                 newbuf[s] = short((1-dx)*(c + c1) + (c2 + c3)*dx);
              
                 s++;
@@ -204,7 +207,8 @@ sprite::spritec::spritec(const char* fpath, Vector2 pos) :file{ spritefile::spri
 
 
     this->pos = pos;
-
+    this->posscale = Vector2(1, 1);
+    
 }
 //false drawmode = pixelated else it it bilinier interpolated
 void sprite::spritec::drawtoscreen(bool drawmode,short addcol)
@@ -219,8 +223,9 @@ void sprite::spritec::drawtoscreen(bool drawmode,short addcol)
    bool yflip = false;
     bool xflip = false;
     Vector2 scales = this->posscale;
+   
     if (scales.x < 0 || scales.y < 0) {
-       
+
         if (scales.x < 0)
         {
             scales.x = abs(scales.x);
@@ -230,13 +235,55 @@ void sprite::spritec::drawtoscreen(bool drawmode,short addcol)
         {
             scales.y = abs(scales.y);
             yflip = true;
+
         }
     }
+    int ydd2 = floor(this->file.ydim * scales.y / 2);
+    int xdd2 = floor(this->file.xdim * scales.x / 2);
+    int pxscle = ceil(this->file.xdim * scales.x);
+    int pxlscle = -xdd2;
+    int pxrscle = xdd2;
+
+    int pyscle = ceil(this->file.ydim * scales.y);
+
+
+    int pyuscle = ydd2;
+
+
+
+    int pydscle = -ydd2;
+    if (pydscle + pos.y <= -200)
+    {
+        pydscle = -200 - pos.y;
+    }
+    if (pyuscle + pos.y <= -200|| pydscle + pos.y >= 200)
+    {
+        return;
+    }
+    if (pyuscle + pos.y >= 200)
+    {
+        pyuscle = 200 - pos.y;
+    }
+   
+    if (pxlscle + pos.x <= -200)
+    {
+        pxlscle = -200 - pos.x;
+    }
+    if (pxrscle + pos.x <= -200|| pxlscle + pos.x >= 200)
+    {
+        return;
+    }
+    if (pxrscle + pos.x >= 200)
+    {
+        pxrscle = 200 - pos.x;
+    }
+
     if (scales.y==0||scales.x==0)
     {
         return;
         //drawing here gives memory error and no need to draw here either
     }
+
     short* buf;
     if (scales.x==1&&scales.y==1)
     {
@@ -247,48 +294,59 @@ void sprite::spritec::drawtoscreen(bool drawmode,short addcol)
        buf = scale(this->file, scales,drawmode);
     }
     short val = 0;
-    int pxscle = ceil(this->file.xdim * scales.x);
-    int pyscle = ceil(this->file.ydim * scales.y);
+  
+    //fliped sprites are drawn backyords
+ 
 
-    //fliped sprites are drawn backwords
-
+    
     int jsgn = (yflip) ? ( - 1) : 1;
 
     int xsgn = (xflip) ? (-1) : 1;
-    int xstart = ((xflip) ? (pxscle - 1) : 0);
-    int xend = ((!xflip) ? (pxscle - 1) : 0);
-        int ydx = 0;
-        int start = ((yflip) ? (pyscle - 1) : 0);
-        int end = ((!yflip) ? (pyscle - 1) : 0);
-       
-        for (int j = start; j!= end; j+=jsgn)
+    int xstart = ((!xflip) ? (pxlscle) : pxrscle);
+  
+        
+        int ystart = ((yflip) ? (pyuscle-1) : pydscle);
+      
+
+        int yp = pos.y+ystart;
+        for (int j = pydscle; j!= pyuscle; j++)
         {
             
 
-            int yp = (j + pos.y);
-            int px = round(pos.x);
-
+           
+            int px = xstart;
+            int ydx = (pxscle) * (j + ydd2);
           
-            for (int i = xstart; i != xend; i+=xsgn)
+            for (int i = pxlscle; i != pxrscle; i++)
             {
-                val = buf[i + ydx];
+                val = buf[i + ydx+xdd2];
              
-                if (val!= 0)
+                if (val!= 0&&Render::unsafegetpix(px, yp)==0)
                 {
                     if (addingcol){
 
-                        val = min(max(1, val + addcol), 16);
-
+                        
+                        val +=addcol;
+                        if (val>16)
+                        {
+                            val = 16;
+                        }
+                        else if (val<1)
+                        {
+                            val = 1;
+                        }
                     }
 
                   
                 //since pixels colors have diffrence of 16 and we alreadt checked for null pixels we can leftshift four times
                     
-                    Render::setpix(px, yp, (val<<4)-16);
+                    Render::unsafesetpix(px, yp, (val<<4)-16);
                 }
-                px++;
+                px+=xsgn;
+                
             }
-            ydx += pxscle;
+            
+             yp+=jsgn;
         }
         
     

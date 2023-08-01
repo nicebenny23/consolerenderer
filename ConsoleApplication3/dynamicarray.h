@@ -80,8 +80,11 @@ namespace dynamicarray {
 	}
 	template<class T>
 	T& array<T>::gettop() {
+		if (length>0)
+		{
+			return list[length - 1];
 
-		return list[length-1];
+		}
 
 	}
 	
@@ -147,7 +150,7 @@ namespace dynamicarray {
 			return true;
 		}
 		return false;
-
+		
 	}
 	template<class T>
 	bool array<T>::cutind(int startindex,int endindex) {

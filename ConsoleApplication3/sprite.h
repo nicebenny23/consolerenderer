@@ -10,10 +10,12 @@ namespace sprite {
         int ydim;
         
         spritefile(const char* fpath);
+
     };
 
     struct spritec {
     public:
+        int layer;
         v2::Vector2 com;
 
         v2::Vector2 pos;

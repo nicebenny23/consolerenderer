@@ -4,6 +4,7 @@
 
 #include <chrono>
 #include "Renderer.h"
+#pragma warning(disable: 4996)
 #include <Windows.h>
 #include "screenset.h"
 #include "Colorinfo.h"
@@ -20,11 +21,39 @@ using namespace dynamicarray;
 using namespace winutil;
 using namespace pgon;
 using namespace v2;
+char* num;
+int len;
+int 	xdim = 8;
+int 	ydim = 8;
+
+int totxs;
+int totys;
+void setfilepix(const int x, const int y, char* dat,FILE* fp) {
+
+
+	if (y <= ydim/2 && y >= -ydim/2 && x <=xdim/2 && x >= -xdim/2) {
+
+		fseek(fp, 0, SEEK_SET);
+		fwrite(dat, 1, xdim * ydim, fp);
+	}
+}
+void setfilepix(const int x, const int y, const char* dat, FILE* fp) {
+
+
+	fseek(fp, 0, SEEK_SET);
+		fwrite(dat, 1, xdim * ydim, fp);
+	
+}
+int indfrm(int x, int y) {
+
+
+	return (round((200 + x ) / totxs))+xdim* (ydim - round((200 + y) / totys)-1) + len;
+	
+}
 
 int main()
 {
-	srand((unsigned)(time)(0));
-	array<int> a = array<int>(4);
+	
 	const HANDLE hOut = GetStdHandle(STD_OUTPUT_HANDLE);
 	const HANDLE hIn = GetStdHandle(STD_INPUT_HANDLE);
 	static COORD screensize = { 800,800 };
@@ -38,82 +67,81 @@ int main()
 	setmode(hIn);
 	setcursor(hOut);
 	setfont(ftsize, hOut);
+
 	setbuffer(screensize, ftsize, hOut);
 
 
 
-	polygon pg = polygon();
 	createscreen(screensize.X, screensize.Y, ftsize, &hOut);
-	pg.pointlist.append(Vector2(-94, -84));
-	pg.append(Vector2(-133, -22));
-	pg.pointlist.append(Vector2(1, 166));
 	
-	pg.pointlist.append(Vector2(60, 55));
-	pg.append(Vector2(3, -44));
-	sprite::spritec fa = sprite::spritec("fprintf.txt",Vector2(0,0));
-	Vector2 morb[3] = { Vector2(-22, -22), Vector2(33, 33), Vector2(354,54) };
 
-triangle tri = triangle(morb);
+	FILE* fp;
+	struct stat fst;
+
+	 len= floor(floor(log10(xdim)) + 4 + floor(log10(ydim)));
+	fp = fopen("fprintf.txt", "w");
+	int tot = xdim * ydim;
+
+	char* buf =new char[tot+1+len];
+	for (int i = 0; i < tot+len; i++)
+	{
+		*(buf + i) = 97;
+	}
+	buf[tot+len] = 0;
+	float t = 0;
+	char l = '1';
 	 userinput::initiate();
-	
-	 v2::Vector2 d = v2::Vector2(2, 2);
-	 float t=1;
-	 int g = 1;
-	 int p = 1;
-	 
-	 int th = 1;
+	 char sarr[6] = { '8',';' ,'8',';' };
+	 for (int i = 0; i < len; i++)
+	 {
+		 buf[i] = sarr[i];
+	 }
 	 init();
+	 totxs = floor (400 / (xdim ));
+	 totys = floor( 400/(ydim));
+	 
 	 while (true)
 	 {
 		
+
+		
 		userinput::getinput(hIn);
 		clearscreen();
-		
-	
-		if (userinput::Getkey('r').held)
-		{
-			pg.pointlist.deleteind(pg.pointlist.length-1);
-		}
+		drawbox(0, 0, 400, 400, 160);
+		for (int j = 0; j < ydim; j++) {
+			for (int i = 0; i < xdim; i++)
+			{
+				char colnow = buf[ i + (ydim-j-1) * xdim+len];
 
-		if (userinput::Getkey('a').held)
-		{
-			pg.pointlist[3] += v2::Vector2(0, 11);
-		}
-		Vector2 polymass = pgon::centerofmass(pg);
-		
+			
+				if (colnow!= 97)
+				{
+					drawbox(i * totxs - 200 + totxs / 2, j * totys - 200 + totys / 2, totxs - 2, totys - 2, (colnow - 97) << 4);
+				}
+				
 
-		//drawthickcircle2(0, 0, 55, th ,Blue);
-	//	drawbox(round(userinput::mousestate.pos.x),round( userinput::mousestate.pos.y), 4, 41, col(6));
-			d += v2::Vector2(.5, 3*cos(v2::distance(d,v2::zerov)));
-		//setpix(44, 102, Red);
-	
-		// drawline(2, 2, 33, 4, Red);
-	
-		//drawlinet(22, 22, 33, 44,44, Green);
+			
+			}
+		}
+		if (userinput::Getkey('g').pressed)
+		{
+
+			buf[indfrm(userinput::mousestate.pos.x, userinput::mousestate.pos.y)] = 100;
 		
+			setfilepix(0, 0, buf, fp);
+			
+		}
 		 auto a = high_resolution_clock::now();
 		
+
 		
 			
-			
-				//pg.drawout(1, 128);
-			
-		fa.drawtoscreen( true);
-		fa.posscale = Vector2(20, 20);
-		//	drawbox(polymass.x, polymass.y, 22, 22, 240);
-			 auto b = high_resolution_clock::now();
+		
+ auto b = high_resolution_clock::now();
 
 			 auto g = duration_cast<nanoseconds>(b - a).count();
 			 t += g / static_cast<float>(1'00'000);
-			
-			// pg.drawout(4, 16);
-			 if (leftofline(userinput::mousestate.pos,Vector2(0,0),Vector2(-100,100)))
-			 {
-				
-			 }
-			// drawlinet(Vector2(0, 0), Vector2(-100, 100), 4, 120);
-		
-			
+	
 			
 			 drawframe();
 			 userinput::resetkeys();

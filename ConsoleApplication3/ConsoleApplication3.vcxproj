@@ -95,6 +95,7 @@
     <ClCompile Include="userinput.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="oalgorithm.h" />
     <ClInclude Include="boxflt.h" />
     <ClInclude Include="btree.h" />
     <ClInclude Include="Colorinfo.h" />

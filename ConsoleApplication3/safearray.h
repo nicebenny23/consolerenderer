@@ -153,6 +153,18 @@ namespace saferarray {
 		safearray<T> array = safearray(dynamic);
 		return array;
 	}
+	template<class T>
+	array<T> todynamic(safearray<T> safe)
+	{
+		
+		safearray<T> array = array(safe.length);
+
+		for (int i = 0; i < safe.length; i++)
+		{
+			array[i] = safe[i];
+		}
+		return array;
+	}
 
 }
 #endif

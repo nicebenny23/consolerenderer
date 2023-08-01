@@ -44,10 +44,30 @@ inline	void setpix(const int x, const int y, DWORD col) {
 		
 		
 		if (y <= hHeight && y >= -hHeight&&  x <= hWidth&& x >= -hWidth) {
-			pixelarray[-(Width * y)+x+cval ].Attributes =col;
+			pixelarray[x -(Width * y)+cval ].Attributes =col;
 			
 		}
 	}
+
+DWORD getpix(int x, int y)
+{
+
+
+
+	if (y <= hHeight && y >= -hHeight && x <= hWidth && x >= -hWidth) {
+		return pixelarray[-(Width * y) + x + cval].Attributes;
+
+	}
+}
+
+DWORD unsafegetpix(int x, int y)
+{
+	
+		return pixelarray[x + cval-Width * y].Attributes;
+
+	
+}
+
 
 
 

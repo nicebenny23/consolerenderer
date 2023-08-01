@@ -20,6 +20,8 @@ namespace Render
 		void createscreen(short startwidth, short startheight, COORD fontsize, const HANDLE* hout);
 		void drawframe();
 		void setpix(int x, int	y, DWORD col);
+		DWORD getpix(int x, int	y);
+		DWORD unsafegetpix(int x, int y);
 		void unsafesetpix(int x, int y, DWORD col);
 	void clearscreen();
 
