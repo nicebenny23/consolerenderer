@@ -92,6 +92,7 @@
     <ClCompile Include="random.cpp" />
     <ClCompile Include="Renderer.cpp" />
     <ClCompile Include="sprite.cpp" />
+    <ClCompile Include="spriterender.cpp" />
     <ClCompile Include="userinput.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -108,7 +109,9 @@
     <ClInclude Include="safearray.h" />
     <ClInclude Include="screenset.h" />
     <ClInclude Include="Renderer.h" />
+    <ClInclude Include="shader.h" />
     <ClInclude Include="sprite.h" />
+    <ClInclude Include="spriterender.h" />
     <ClInclude Include="transfom.h" />
     <ClInclude Include="triangle.h" />
     <ClInclude Include="triangulate.h" />

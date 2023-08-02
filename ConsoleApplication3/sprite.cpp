@@ -117,13 +117,11 @@ spritefile::spritefile(const char* fpath)
     fclose(fp);
     delete[] num;
 }
-
-//upscales and scales
-short* sprite::scale(spritefile sprit, Vector2 scale,bool mode)
+short* sprite::scale(spritefile sprit, Vector2 scale, bool mode)
 {
     int newx = ceil(sprit.xdim * abs(scale.x));
     int newy = ceil(sprit.ydim * abs(scale.y));
-   double invscx = sprit.xdim / static_cast<float>(newx);
+    double invscx = sprit.xdim / static_cast<float>(newx);
     double invscy = sprit.ydim / static_cast<float>(newy);
     int newtotal = newx * newy;
     short* newbuf = new short[(newtotal)];
@@ -133,7 +131,7 @@ short* sprite::scale(spritefile sprit, Vector2 scale,bool mode)
     {
         int s = 0;
         bool tst = false;
-        for (int j = newy-1; j >= 0; j--)
+        for (int j = newy - 1; j >= 0; j--)
         {
             double oy = j * invscy;
             int y = int(oy);
@@ -145,63 +143,226 @@ short* sprite::scale(spritefile sprit, Vector2 scale,bool mode)
             for (int i = 0; i < newx; i++)
             {
 
-              
-                int x =int(ox);
+
+                int x = int(ox);
                 int x1 = min((1 + x), xdm1);
-               
-             
-               
-                double dx =ox - x;
-           
-                double c = sprit.bufdat[x +xdm] * (1 - dy);
-                double c1 = sprit.bufdat[x +xdmp] * (dy);
-                double c2 = sprit.bufdat[x1 +xdm] * (1 - dy);
+
+
+
+                double dx = ox - x;
+
+                double c = sprit.bufdat[x + xdm] * (1 - dy);
+                double c1 = sprit.bufdat[x + xdmp] * (dy);
+                double c2 = sprit.bufdat[x1 + xdm] * (1 - dy);
                 double c3 = sprit.bufdat[x1 + xdmp] * (dy);
-             
 
 
 
-                newbuf[s] = short((1-dx)*(c + c1) + (c2 + c3)*dx);
-             
+
+                newbuf[s] = short((1 - dx) * (c + c1) + (c2 + c3) * dx);
+
                 s++;
                 ox += invscx;
             }
         }
-        
+
     }
     else
     {
-        int s = 0;
-        for (int j = newy-1; j >=0; j--)
+        int ind = 0;
+        for (int j = newy - 1; j >= 0; j--)
         {
             double oy = j * invscy;
             int y = min(int(oy), ydm1);
             double ox = 0;
-           int yd = sprit.xdim * y;
+            int yd = sprit.xdim * y;
             for (int i = 0; i < newx; i++)
             {
-               
+
 
                 int x = int(ox);
-               
-              short  c = sprit.bufdat[x+yd];
 
-                newbuf[s] =c;
+                short  c = sprit.bufdat[x + yd];
+
+                newbuf[ind] = c;
+                ind++;
+                ox += invscx;
+            }
+        }
+
+    }
+    return newbuf;
+
+}
+
+short* sprite::scale(short* sprit, Vector2 scale, bool mode, int xdim, int ydim)
+{
+
+    int newx = ceil(xdim * abs(scale.x));
+    int newy = ceil(ydim * abs(scale.y));
+    double invscx = xdim / static_cast<float>(newx);
+    double invscy = ydim / static_cast<float>(newy);
+    int newtotal = newx * newy;
+    short* newbuf = new short[(newtotal)];
+    int xdm1 = xdim - 1;
+    int ydm1 =ydim - 1;
+    if (mode == true)
+    {
+        int s = 0;
+        bool tst = false;
+        for (int j = newy - 1; j >= 0; j--)
+        {
+            double oy = j * invscy;
+            int y = int(oy);
+            int y1 = int(min((1 + y), ydm1));
+            double dy = oy - y;
+            double ox = 0;
+            int xdm = xdim * y;
+            int xdmp =xdim * y1;
+            for (int i = 0; i < newx; i++)
+            {
+
+
+                int x = int(ox);
+                int x1 = min((1 + x), xdm1);
+
+
+
+                double dx = ox - x;
+
+                double c = sprit[x + xdm] * (1 - dy);
+                double c1 = sprit[x + xdmp] * (dy);
+                double c2 = sprit[x1 + xdm] * (1 - dy);
+                double c3 = sprit[x1 + xdmp] * (dy);
+
+
+
+
+                newbuf[s] = short((1 - dx) * (c + c1) + (c2 + c3) * dx);
+
                 s++;
                 ox += invscx;
             }
         }
-     
+
     }
+    else
+    {
+        int ind = 0;
+        for (int j = newy - 1; j >= 0; j--)
+        {
+            double oy = j * invscy;
+            int y = min(int(oy), ydm1);
+            double ox = 0;
+            int yd = xdim * y;
+            for (int i = 0; i < newx; i++)
+            {
+
+
+                int x = int(ox);
+
+                short  c = sprit[x + yd];
+
+                newbuf[ind] = c;
+                ind++;
+                ox += invscx;
+            }
+        }
+
+    }
+    delete[] sprit;
     return newbuf;
+    
+}
+
+//upscales and scales
+short* sprite::applytex(spritec sprit, spritec tex, bool mode,bool aod)
+{
+
+   
+   int sx = sprit.posscale.x;
+   int sy = sprit.posscale.y;
+   int sxdim = sprit.file.xdim;
+   int sydim = sprit.file.ydim;
+   int texdx = tex.file.xdim;
+   int texdy = tex.file.ydim;
+   int sxd2 = sx / 2;
+   int syd2 = sy / 2;
+  
+ 
+ float texxd2 = (tex.posscale.x/2);
+   float texyd2 = (tex.posscale.y/2);
+   int xtpos = tex.pos.x;
+   int ytpos = tex.pos.y;
+   Vector2 topintl = zerov;
+   Vector2 botintr = zerov;
+   
+
+  
+  
+   topintl.x = max(-sxd2 * sxdim, xtpos - texxd2 * texdx);
+   topintl.y = min(syd2 * sydim, ytpos + texyd2 * texdy);
+botintr.x = min(xtpos+ texxd2 * texdx, sxd2 * sxdim);
+   botintr.y = max(ytpos - texyd2 * texdy, -syd2 * sydim);
+  
+ 
+
+   int dy = topintl.y - botintr.y;
+   short* buf = new short[sxdim * sydim];
+   
+       int ind = 0;
+       for (int i = 0; i < sxdim*sydim; i++)
+       {
+       
+        
+        
+              buf[ind] = sprit.file.bufdat[ind];
+
+             
+    
+               
+                      
+              
+                 
+              ind++;
+             
+
+           
+
+
+       }
+
+   
+
+
+   for (int i = ceil(topintl.x); i < floor(botintr.x); i+=sx)
+   {
+
+       for (int j = ceil(botintr.y); j < floor(topintl.y); j+=sy)
+       {
+           int g = tex.getatpos(Vector2(i, j));
+
+           if (g !=-1)
+           {
+               int ind = sprit.getatposig(Vector2(i, j));
+               char l = tex.file.bufdat[g];
+               buf[ind] =max(1,min(16,buf[ind]*l));
+
+
+           }
+          
+       }
+
+   }
+
+
+
+    return buf;
   
 }
 
-// Interpolation function
-float sprite::lerpa(float a, float b, float t)
-{
-    return a + t * (b - a);
-}
+
+
 sprite::spritec::spritec(const char* fpath, Vector2 pos) :file{ spritefile::spritefile(fpath) }
 {
 
@@ -211,155 +372,52 @@ sprite::spritec::spritec(const char* fpath, Vector2 pos) :file{ spritefile::spri
     
 }
 //false drawmode = pixelated else it it bilinier interpolated
-void sprite::spritec::drawtoscreen(bool drawmode,short addcol)
+
+int sprite::spritec::getatpos(Vector2 pos)
 {
+    int gh= this->file.xdim;
+    int gv = this->file.ydim;
+    int xoh = floor(this->posscale.x);
+    int yoh = floor(this->posscale.y);
+    int xh = floor(this->posscale.x * this->file.xdim / 2);
+    int yh = floor(this->posscale.y * this->file.ydim / 2);
+    int x = this->pos.x;
+    int y = this->pos.y;
 
-    bool addingcol = false;
-    if (addcol != 0)
-    {
-        addingcol = true;
-    }
-    Vector2 pos = this->pos;
-   bool yflip = false;
-    bool xflip = false;
-    Vector2 scales = this->posscale;
-   
-    if (scales.x < 0 || scales.y < 0) {
+    int l = floor(((pos.x - (x - xh)) / xoh)) + this->file.xdim * floor((  yh+pos.y - y) /yoh);
 
-        if (scales.x < 0)
-        {
-            scales.x = abs(scales.x);
-            xflip = true;
-        }
-        if (scales.y < 0)
-        {
-            scales.y = abs(scales.y);
-            yflip = true;
-
-        }
-    }
-    int ydd2 = floor(this->file.ydim * scales.y / 2);
-    int xdd2 = floor(this->file.xdim * scales.x / 2);
-    int pxscle = ceil(this->file.xdim * scales.x);
-    int pxlscle = -xdd2;
-    int pxrscle = xdd2;
-
-    int pyscle = ceil(this->file.ydim * scales.y);
-
-
-    int pyuscle = ydd2;
-
-
-
-    int pydscle = -ydd2;
-    if (pydscle + pos.y <= -200)
-    {
-        pydscle = -200 - pos.y;
-    }
-    if (pyuscle + pos.y <= -200|| pydscle + pos.y >= 200)
-    {
-        return;
-    }
-    if (pyuscle + pos.y >= 200)
-    {
-        pyuscle = 200 - pos.y;
-    }
-   
-    if (pxlscle + pos.x <= -200)
-    {
-        pxlscle = -200 - pos.x;
-    }
-    if (pxrscle + pos.x <= -200|| pxlscle + pos.x >= 200)
-    {
-        return;
-    }
-    if (pxrscle + pos.x >= 200)
-    {
-        pxrscle = 200 - pos.x;
-    }
-
-    if (scales.y==0||scales.x==0)
-    {
-        return;
-        //drawing here gives memory error and no need to draw here either
-    }
-
-    short* buf;
-    if (scales.x==1&&scales.y==1)
-    {
-         buf = this->file.bufdat;
-    }
-    else
-    {
-       buf = scale(this->file, scales,drawmode);
-    }
-    short val = 0;
-  
-    //fliped sprites are drawn backyords
- 
-
-    
-    int jsgn = (yflip) ? ( - 1) : 1;
-
-    int xsgn = (xflip) ? (-1) : 1;
-    int xstart = ((!xflip) ? (pxlscle) : pxrscle);
-  
-        
-        int ystart = ((yflip) ? (pyuscle-1) : pydscle);
-      
-
-        int yp = pos.y+ystart;
-        for (int j = pydscle; j!= pyuscle; j++)
-        {
-            
-
-           
-            int px = xstart;
-            int ydx = (pxscle) * (j + ydd2);
-          
-            for (int i = pxlscle; i != pxrscle; i++)
-            {
-                val = buf[i + ydx+xdd2];
-             
-                if (val!= 0&&Render::unsafegetpix(px, yp)==0)
-                {
-                    if (addingcol){
-
-                        
-                        val +=addcol;
-                        if (val>16)
-                        {
-                            val = 16;
-                        }
-                        else if (val<1)
-                        {
-                            val = 1;
-                        }
-                    }
-
-                  
-                //since pixels colors have diffrence of 16 and we alreadt checked for null pixels we can leftshift four times
-                    
-                    Render::unsafesetpix(px, yp, (val<<4)-16);
-                }
-                px+=xsgn;
-                
-            }
-            
-             yp+=jsgn;
-        }
-        
-    
-    if (scales.x!= 1||scales.y!=1)
+    if (l>=0&&l<gh*gv)
     {
 
-        // we did nothing if scale was (1,1) due to optimizations so if we deleted it wed delete the whole buffer
-        delete[] buf;
+
+      return l;
     }
-  
+
+
+
+    return -1;
 }
-
-short sprite::spritec::getpixfrompix(Vector2 pos)
+int sprite::spritec::getatposig(Vector2 pos)
 {
-    return 0;
+    int gh = this->file.xdim;
+    int gv = this->file.ydim;
+    int xoh = floor(this->posscale.x);
+    int yoh = floor(this->posscale.y);
+    int xh = floor(this->posscale.x * this->file.xdim / 2);
+    int yh = floor(this->posscale.y * this->file.ydim / 2);
+    int x = 0;
+    int y = 0;
+
+    int l = floor(((pos.x - (x - xh)) / xoh)) + this->file.xdim * floor((yh + pos.y - y) / yoh);
+
+    if (l >= 0 && l < gh * gv)
+    {
+
+
+        return l;
+    }
+
+
+
+    return -1;
 }

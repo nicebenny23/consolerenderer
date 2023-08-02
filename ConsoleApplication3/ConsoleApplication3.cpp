@@ -13,6 +13,7 @@
 #include "sprite.h"
 #include "userinput.h"
 #include "random.h"
+#include "spriterender.h"
 using namespace Render;
 using namespace Color;
 using namespace std::chrono;
@@ -22,35 +23,7 @@ using namespace winutil;
 using namespace pgon;
 using namespace v2;
 char* num;
-int len;
-int 	xdim = 8;
-int 	ydim = 8;
-
-int totxs;
-int totys;
-void setfilepix(const int x, const int y, char* dat,FILE* fp) {
-
-
-	if (y <= ydim/2 && y >= -ydim/2 && x <=xdim/2 && x >= -xdim/2) {
-
-		fseek(fp, 0, SEEK_SET);
-		fwrite(dat, 1, xdim * ydim, fp);
-	}
-}
-void setfilepix(const int x, const int y, const char* dat, FILE* fp) {
-
-
-	fseek(fp, 0, SEEK_SET);
-		fwrite(dat, 1, xdim * ydim, fp);
-	
-}
-int indfrm(int x, int y) {
-
-
-	return (round((200 + x ) / totxs))+xdim* (ydim - round((200 + y) / totys)-1) + len;
-	
-}
-
+sprite::spritec sp = sprite::spritec("fprintf.txt",zerov);
 int main()
 {
 	
@@ -74,79 +47,45 @@ int main()
 
 	createscreen(screensize.X, screensize.Y, ftsize, &hOut);
 	
-
-	FILE* fp;
-	struct stat fst;
-
-	 len= floor(floor(log10(xdim)) + 4 + floor(log10(ydim)));
-	fp = fopen("fprintf.txt", "w");
-	int tot = xdim * ydim;
-
-	char* buf =new char[tot+1+len];
-	for (int i = 0; i < tot+len; i++)
-	{
-		*(buf + i) = 97;
-	}
-	buf[tot+len] = 0;
 	float t = 0;
-	char l = '1';
+	
 	 userinput::initiate();
-	 char sarr[6] = { '8',';' ,'8',';' };
-	 for (int i = 0; i < len; i++)
-	 {
-		 buf[i] = sarr[i];
-	 }
+	
 	 init();
-	 totxs = floor (400 / (xdim ));
-	 totys = floor( 400/(ydim));
-	 
+
 	 while (true)
 	 {
 		
-
+		 
 		
 		userinput::getinput(hIn);
 		clearscreen();
-		drawbox(0, 0, 400, 400, 160);
-		for (int j = 0; j < ydim; j++) {
-			for (int i = 0; i < xdim; i++)
-			{
-				char colnow = buf[ i + (ydim-j-1) * xdim+len];
-
-			
-				if (colnow!= 97)
-				{
-					drawbox(i * totxs - 200 + totxs / 2, j * totys - 200 + totys / 2, totxs - 2, totys - 2, (colnow - 97) << 4);
-				}
-				
-
-			
-			}
-		}
-		if (userinput::Getkey('g').pressed)
-		{
-
-			buf[indfrm(userinput::mousestate.pos.x, userinput::mousestate.pos.y)] = 100;
-		
-			setfilepix(0, 0, buf, fp);
-			
-		}
+	
 		 auto a = high_resolution_clock::now();
-		
-
-		
+		 sp.pos = Vector2(abs(int(2*t)%400-200)*2-200,200-round(t/100)*50);
+		 sp.posscale = Vector2(10, 10);
+	
+		 spriterenderer::drawtoscreen(&sp, true, 0);
 			
 		
- auto b = high_resolution_clock::now();
 
-			 auto g = duration_cast<nanoseconds>(b - a).count();
-			 t += g / static_cast<float>(1'00'000);
+
+			
 	
 			
 			 drawframe();
 			 userinput::resetkeys();
+			 auto g= 0;
+			 do
+			 {
+				 auto b = high_resolution_clock::now();
+				 g = duration_cast<nanoseconds>(b - a).count();
+			 } while (g < 1000000);
+			 
 
-			
+
+
+			 t += g / static_cast<float>(1'00'000000);
 		 }
 	 
 	

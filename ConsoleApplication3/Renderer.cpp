@@ -27,7 +27,7 @@ COORD Dimval;
 		
 		 hWidth = (Width / 2);
 			hHeight = (Height / 2);
-		 Dim = v2::Vector2(0,0);
+			Dim = Vector2(Width, Height);
 		 Dimval = { short(Width),short(Height) };
 		
 		pixelarray = new CHAR_INFO[Width * Height];
