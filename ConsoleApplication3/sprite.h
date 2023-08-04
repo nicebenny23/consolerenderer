@@ -12,19 +12,21 @@ namespace sprite {
         int ydim;
         
         spritefile(const char* fpath);
-
+        spritefile() = default;
     };
 
     struct spritec {
     public:
         int layer;
         v2::Vector2 com;
-        
+        spritec() = default;
         v2::Vector2 pos;
         v2::Vector2 posscale;
       
-       
-      
+      bool  operator<(spritec& sprit);
+      bool  operator >= (spritec& sprit);
+      bool  operator>(spritec& sprit);
+
 
         spritec(const char* fpath,Vector2 pos);
 

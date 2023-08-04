@@ -22,8 +22,10 @@ using namespace dynamicarray;
 using namespace winutil;
 using namespace pgon;
 using namespace v2;
+
 char* num;
 sprite::spritec sp = sprite::spritec("fprintf.txt",zerov);
+sprite::spritec gp = sprite::spritec("fprintf.txt", zerov);
 int main()
 {
 	
@@ -31,8 +33,6 @@ int main()
 	const HANDLE hIn = GetStdHandle(STD_INPUT_HANDLE);
 	static COORD screensize = { 800,800 };
 	static COORD ftsize = { 2,2 };
-
-
 
 	v2::Vector2 vbo = v2::Vector2(2, 2);
 
@@ -64,12 +64,9 @@ int main()
 		 auto a = high_resolution_clock::now();
 		 sp.pos = Vector2(abs(int(2*t)%400-200)*2-200,200-round(t/100)*50);
 		 sp.posscale = Vector2(10, 10);
-	
-		 spriterenderer::drawtoscreen(&sp, true, 0);
-			
-		
+	//	pipe.render();
 
-
+		 spriterenderer::drawtoscreen(&sp, false);
 			
 	
 			

@@ -2,10 +2,11 @@
 #include "Renderer.h"
 #include "sprite.h"
 #include "shader.h"
-
+#include "oalgorithm.h"
+#include "safearray.h"
 using namespace sprite;
-
-
+using namespace spriterenderer;
+array<spritec*> spriterenderer::spritelist;
 
 
 void spriterenderer::drawtoscreen(spritec* sprit,bool drawmode, short addcol)
@@ -89,22 +90,22 @@ void spriterenderer::drawtoscreen(spritec* sprit,bool drawmode, short addcol)
     {
 
         sprit->pos = Vector2(0, 0);
+  spritec dd = spritec("line.txt", zerov);
 
-        spritec dd = spritec("line.txt", zerov);
-
-        dd.posscale = Vector2(10, 10);
-
+     //   dd.posscale = Vector2(10, 10);
+  delete   dd.file.bufdat;
        
-        buf = applytex(*sprit, dd, true, false);
+       // buf = applytex(*sprit, dd, true, false);
 
 
-        buf = scale(buf, scales, drawmode, sprit->file.xdim, sprit->file.ydim);
+        buf = scale(sprit->file.bufdat, scales, drawmode,sprit->file.xdim,sprit->file.ydim);
     }
+    
     short val = 0;
   
     //fliped sprites are drawn backyords
 
-
+  
 
     int jsgn = (yflip) ? (-1) : 1;
 
@@ -170,5 +171,28 @@ void spriterenderer::drawtoscreen(spritec* sprit,bool drawmode, short addcol)
     }
 
     delete[] buf;
+    
+}
 
+void spriterenderer::render()
+{
+    saferarray::safearray<spritec> arr = saferarray::safearray<spritec>(spritelist.length);
+    for (int i = 0; i < spritelist.length; i++)
+    {
+        arr[i] = *spritelist[i];
+
+    }
+
+    oalgorithm::quicksort<spritec>(arr.getdata(), spritelist.length);
+    for (int i = spritelist.length-1; i >= 0; i--)
+    {
+        drawtoscreen(&arr[i], false);
+    }
+
+}
+
+void spriterenderer::renderinit()
+{
+
+    spritelist = array<spritec*>(2);
 }

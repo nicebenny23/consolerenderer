@@ -270,7 +270,7 @@ short* sprite::scale(short* sprit, Vector2 scale, bool mode, int xdim, int ydim)
         }
 
     }
-    delete[] sprit;
+
     return newbuf;
     
 }
@@ -362,6 +362,20 @@ botintr.x = min(xtpos+ texxd2 * texdx, sxd2 * sxdim);
 }
 
 
+
+bool sprite::spritec::operator<(spritec& sprit)
+{
+    return(layer < sprit.layer?true:false);
+}
+
+bool sprite::spritec::operator>=(spritec& sprit)
+{
+    return(layer >= sprit.layer ? true : false);
+}
+bool sprite::spritec::operator>(spritec& sprit)
+{
+    return(layer > sprit.layer ? true : false);
+}
 
 sprite::spritec::spritec(const char* fpath, Vector2 pos) :file{ spritefile::spritefile(fpath) }
 {

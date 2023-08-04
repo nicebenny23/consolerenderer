@@ -4,9 +4,9 @@
 #ifndef safearray_HPP
 #define safearray_HPP
 
-using namespace dynamicarray;
-namespace saferarray {
 
+namespace saferarray {
+	using namespace dynamicarray;
 
 	template<class T>
 	class safearray
