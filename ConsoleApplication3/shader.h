@@ -1,14 +1,18 @@
 #include "vector2.h"
 #include "sprite.h"
 #ifndef shader_h
-
-struct shader
+#define shader_h
+using namespace sprite;	
+struct fshader
 {
-	void* (*shade)(short*, int, int, v2::Vector2);
+	void (*shade) (spritec*);
 
+
+
+	 fshader(void (*shadeinp) (spritec*));
+	 
 
 };
-
 
 
 #endif // !

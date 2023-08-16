@@ -42,7 +42,7 @@ namespace v2
 	};
 
 	const  Vector2 zerov = Vector2(0, 0);
-
+	const  Vector2 unitv = Vector2(1, 1);
 	inline Vector2 Coordtovector(COORD pos) {
 
 
@@ -60,7 +60,22 @@ namespace v2
 
 		return(sqrt((p.x - p1.x) * (p.x - p1.x) + (p.y - p1.y) * (p.y - p1.y)));
 	}
+	inline Vector2 sgn(const Vector2& p, const Vector2& p1) {
 
+
+		//sgn of p-p1
+		Vector2 retv = Vector2(1, 1);
+
+		if (p1.x>p.x)
+		{
+			retv.x *= -1;
+		}
+		if (p1.y > p.y)
+		{
+			retv.y *= -1;
+		}
+		return  retv;
+	}
 	inline Vector2 rotpnt( Vector2 p, const Vector2 p1,float degrees) {
 
 		float c = cos(degrees);
@@ -71,7 +86,14 @@ namespace v2
 		p = Vector2(p.x * c - p.y * s, p.x * s + p.y * c);
 		return (p + p1);
 	}
+	inline Vector2 rot( Vector2 p,float degrees) {
 
+		float c = cos(degrees);
+		float s = sin(degrees);
+		
+		p = Vector2(p.x * c - p.y * s, p.x * s + p.y * c);
+		return (p );
+	}
 	inline float magnitude(const Vector2& p) {
 
 		return(sqrt(p.x * p.x + p.y * p.y));

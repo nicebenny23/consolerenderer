@@ -7,7 +7,7 @@ using namespace v2;
 namespace sprite {
     struct spritefile
     {
-        short* bufdat;
+        char* bufdat;
         int xdim;
         int ydim;
         
@@ -22,24 +22,47 @@ namespace sprite {
         spritec() = default;
         v2::Vector2 pos;
         v2::Vector2 posscale;
-      
+      void  operator *=(Vector2 scalev);
+
+
       bool  operator<(spritec& sprit);
       bool  operator >= (spritec& sprit);
       bool  operator>(spritec& sprit);
-
-
-        spritec(const char* fpath,Vector2 pos);
-
-      
+      bool inbounds(Vector2 pos);
+         spritec(const char* fpath,Vector2 dim);
+         spritec(const char* buf, Vector2 dim, Vector2 pos, Vector2 posscale);
+         spritec(char** buf, Vector2 dim, Vector2 pos, Vector2 posscale);//uses same memory dont use normally it is used for built in stuff
+         spritec flipy();
+         spritec flipx();
         spritefile file;
-        int getatpos(Vector2 pos);
+        bool posinsprite(Vector2 pos);
         int getatposig(Vector2 pos);
     };
+    enum scalemode
+    {
+        norm = 0,
+        wrap = 1,
+        mx = 2,
+        my=4,
+
+
+
+    };
+
+
+    enum texmode {
+
+        mask,
+        add,
+        mean,
+
+    };
     
-    short* applytex(spritec sprit, spritec tex, bool mode, bool aod);
+    spritec applytex(spritec sprit, spritec tex);
  //   float lerpa(float a, float b, float t);
   //  void shader(spritefile sprit);
-    short* scale(spritefile sprit,Vector2 scale,bool mode);
-    short* scale(short* sprit, Vector2 scale, bool mode,int xdim,int ydim);
+    spritec scale(spritec sprit,Vector2 scale,scalemode mode);
+    bool posinsprite(Vector2 pos);
+   
 }
 #endif

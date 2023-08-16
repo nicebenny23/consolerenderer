@@ -1,26 +1,27 @@
 #include "spriterender.h"
 #include "Renderer.h"
 #include "sprite.h"
+#include "camera.h"
 #include "shader.h"
 #include "oalgorithm.h"
+#include "random.h"
 #include "safearray.h"
 using namespace sprite;
 using namespace spriterenderer;
 array<spritec*> spriterenderer::spritelist;
 
 
-void spriterenderer::drawtoscreen(spritec* sprit,bool drawmode, short addcol)
-{
 
-    bool addingcol = false;
-    if (addcol != 0)
-    {
-        addingcol = true;
-    }
-    Vector2 pos = sprit->pos;
+float val = 0;
+void spriterenderer::drawtoscreen(spritec* sprit,scalemode drawmode)
+{
+   
+   
+    Vector2 pos = sprit->pos-camera::camerapos;
+    pos *= camera::cscale;
     bool yflip = false;
     bool xflip = false;
-    Vector2 scales = sprit->posscale;
+    Vector2 scales = sprit->posscale*camera::cscale;
 
     if (scales.x < 0 || scales.y < 0) {
 
@@ -32,35 +33,42 @@ void spriterenderer::drawtoscreen(spritec* sprit,bool drawmode, short addcol)
         if (scales.y < 0)
         {
             scales.y = abs(scales.y);
-            yflip = true;
-
+            yflip = true;   
         }
     }
+   
     int ydd2 = floor(sprit->file.ydim * scales.y / 2);
     int xdd2 = floor(sprit->file.xdim * scales.x / 2);
     int pxscle = ceil(sprit->file.xdim * scales.x);
     int pxlscle = -xdd2;
     int pxrscle = xdd2;
-
+    int pyuscle = ydd2;
+    int pydscle = -ydd2;
 
     int sxd2 = ceil(Render::GetDim().x / 2) - 1;
     int syd2 = ceil(Render::GetDim().y / 2) - 1;
     int pyscle = (sprit->file.ydim * scales.y);
 
 
-    int pyuscle = ydd2;
-
-
-
-    int pydscle = -ydd2;
-    if (pydscle + pos.y <= -syd2)
-    {
-        pydscle = -syd2 - pos.y;
-    }
+  
+ 
     if (pyuscle + pos.y <= -syd2 || pydscle + pos.y >= syd2)
     {
         return;
     }
+    if (pxrscle + pos.x <= -sxd2 || pxlscle + pos.x >= sxd2)
+    {
+        return;
+    }
+    //sprite modification shader which can be a fragment shader that can do more goes here this dissalows movment but that stuff goes below
+
+
+
+    if (pydscle + pos.y <= -syd2)
+    {
+        pydscle = -syd2 - pos.y;
+    }
+   
     if (pyuscle + pos.y >= syd2)
     {
         pyuscle = syd2 - pos.y;
@@ -70,10 +78,7 @@ void spriterenderer::drawtoscreen(spritec* sprit,bool drawmode, short addcol)
     {
         pxlscle = -sxd2 - pos.x;
     }
-    if (pxrscle + pos.x <= -sxd2 || pxlscle + pos.x >= sxd2)
-    {
-        return;
-    }
+  
     if (pxrscle + pos.x >= sxd2)
     {
         pxrscle = sxd2 - pos.x;
@@ -85,93 +90,78 @@ void spriterenderer::drawtoscreen(spritec* sprit,bool drawmode, short addcol)
         //drawing here gives memory error and no need to draw here either
     }
 
-    short* buf;
+  
 
+
+
+  
+  
+       
+    spritec buf;
+    
+    if (drawmode == norm)
     {
 
-        sprit->pos = Vector2(0, 0);
-  spritec dd = spritec("line.txt", zerov);
+        buf = scale(*sprit, scales, drawmode);
 
-     //   dd.posscale = Vector2(10, 10);
-  delete   dd.file.bufdat;
-       
-       // buf = applytex(*sprit, dd, true, false);
-
-
-        buf = scale(sprit->file.bufdat, scales, drawmode,sprit->file.xdim,sprit->file.ydim);
     }
+    else
+    {
+
     
-    short val = 0;
+        buf = scale(*sprit, sprit->posscale, drawmode);
+        buf *= camera::cscale;
+       
+    }
+    if (yflip)
+    {
+        buf = buf.flipy();
+    }
+    if (xflip)
+    {
+        buf = buf.flipx();
+    }
+    char val = 0;
   
     //fliped sprites are drawn backyords
 
   
 
-    int jsgn = (yflip) ? (-1) : 1;
+  
 
-    int xsgn = (xflip) ? (-1) : 1;
-    int xstart = ((!xflip) ? (pxlscle) : pxrscle);
-    int c = 0;
-    if (xflip)
+    
+    int yp = pydscle + pos.y;
+
+    for (int j = pydscle; j < pyuscle; j++)
     {
-        c = pxlscle;
-        pxlscle = -pxrscle;
-        pxrscle = -c;
-    }
-    if (yflip)
-    {
-        c = pyuscle;
-        pyuscle = -pydscle;
-        pydscle = -c;
-    }
-    int ystart = ((yflip) ? (pyuscle - 1) : pydscle);
-
-
-    int yp = pos.y + ystart;
-    for (int j = pydscle; j != pyuscle; j++)
-    {
-
 
         //   Render::drawframe();
-        int px = xstart + pos.x;
-        int ydx = (pxscle) * (j + ydd2);
+        int px = pxlscle + pos.x;
+
+        int ydx = (pxscle) * ((pyscle - (j + ydd2)-1));
 
         for (int i = pxlscle; i != pxrscle; i++)
         {
-            val = buf[i + ydx + xdd2];
+            val = buf.file.bufdat[i + ydx + xdd2];
 
-            if (val != 0 && Render::unsafegetpix(px, yp) == 0)
+            if (val != 0)
             {
-                if (addingcol) {
-
-
-                    val += addcol;
-                    if (val > 16)
-                    {
-                        val = 16;
-                    }
-                    else if (val < 1)
-                    {
-                        val = 1;
-                    }
-
-                }
 
 
                 //since pixels colors have diffrence of 16 and we alreadt checked for null pixels we can leftshift four times
-
+                //for pixel position shader will need to replace unsafe pixset with safe pix set
+                //also alpha values could set an extra atribbute that would be used to divide and let other colors throgh
+                //will make most of this as genral to also alow for things like lights
+                //will use ascii field of charinfo to store it
                 Render::unsafesetpix(px, yp, (val << 4) - 16);
 
             }
-            px += xsgn;
+            px ++;
 
         }
-
-        yp += jsgn;
+        yp++;
     }
-
-    delete[] buf;
-    
+    delete[] buf.file.bufdat;
 }
 
 void spriterenderer::render()
@@ -186,7 +176,7 @@ void spriterenderer::render()
     oalgorithm::quicksort<spritec>(arr.getdata(), spritelist.length);
     for (int i = spritelist.length-1; i >= 0; i--)
     {
-        drawtoscreen(&arr[i], false);
+        drawtoscreen(&arr[i], norm);
     }
 
 }

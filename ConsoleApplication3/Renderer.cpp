@@ -49,6 +49,20 @@ inline	void setpix(const int x, const int y, DWORD col) {
 		}
 	}
 
+void settpix(int x, int y, DWORD col,char opacity)
+{
+	//for lighting and transparency
+
+	int ind = x - (Width * y) + cval;
+	if (y <= hHeight && y >= -hHeight && x <= hWidth && x >= -hWidth) {
+		
+			//find info on this structute
+		pixelarray[ind].Attributes 	=(pixelarray[ind].Attributes*(15 - opacity) + unsafegetpix(x, y) * opacity)/16;
+	
+
+	}
+}
+
 DWORD getpix(int x, int y)
 {
 
@@ -118,7 +132,7 @@ v2::Vector2 GetDim()
 	void drawbox(short px, short py, int width, int height, COLORREF pixval) {
 
 
-
+		
 	
 
 
@@ -132,8 +146,11 @@ v2::Vector2 GetDim()
 		{
 			for (short j = voff; j < vpff; j++)
 			{
-
-				setpix(i, j, pixval);
+				if (getpix(i,j)==0)
+				{
+					setpix(i, j, pixval);
+				}
+				
 			}
 		}
 
@@ -611,6 +628,7 @@ v2::Vector2 GetDim()
 			y=short(sqrt(radius * radius - i * i));
 			for (short j = 0; j < y; j++)
 			{
+
 				//all j and i signs combinations
 				setpix(i + px, j + py, pixelval);
 				setpix(-i + px, j + py, pixelval);

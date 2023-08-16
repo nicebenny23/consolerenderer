@@ -12,34 +12,37 @@ namespace dynamicarray {
 	class array
 	{
 	public:
-	
+
 		array();
 		T& operator[](int index);
 		T getelem(int index);
-		
+
 		array(int size);
 		~array();
+		T& at(int ind);
 		bool cutind(int startindex, int endindex);
+		array<T>* slice(int startindex, int endindex);
 		void insertind(int index, T value);
 		void merge(int index, const array& arr);
 		bool deleteind(int index);
 		T& gettop();
-	
+
 		void append(T value);
 		T* getdata();
 		array(const array& arr);
-		 int length;
-		 bool resize(int size = 0);
+		int length;
+		bool resize(int size = 0);
 	private:
-	
-	 int capacity;
-		 T* list;
+
+		int capacity;
+		T* list;
 
 	};
 
 
 
-	
+
+
 	template<class T>
 	T array<T>::getelem(int index) {
 		if (index > length) {
@@ -48,7 +51,7 @@ namespace dynamicarray {
 		}
 		if (index < 0)
 		{
-			return list[0];//to avoid error
+			index = 0;
 		}
 		return list[index];
 	}
@@ -90,7 +93,7 @@ namespace dynamicarray {
 	
 	template<class T>
 	array<T>::~array() {
-		if (list != nullptr) {
+		if (list != nullptr&&list) {
 			delete[] list;
 		}
 	}
@@ -101,7 +104,16 @@ namespace dynamicarray {
 		//unsafe do not use unless needed
 		return list;
 	}
-	
+
+	template<class T>
+	array<T>* array<T>::slice(int startindex, int endindex) {
+
+
+		array<T>* arr = array<T>::array(*this);
+		arr->cutind(startindex, endindex);
+		return &arr;
+	}
+
 	template<class T>
 	array<T>::array(const array& arr) {
 		length = arr.length;
@@ -137,7 +149,7 @@ namespace dynamicarray {
 		if (index < length && index >= 0)//sees if in bounds
 		{
 			
-				return false;
+			
 			
 			length--;//decrements size
 			for (int i = index; i < length; i++)
@@ -219,11 +231,17 @@ namespace dynamicarray {
 	template<class T>
 	T& array<T>::operator[](int index) {
 
-
-		if (index >= length) {//max index is length
+		if (index>= capacity)
+		{
+			if (!resize(2 * index + 2))//array resize failed
+			{
+				return *list;//to avoid error in case of memory fail and derenfrence it because its cool
+			}
+		}
+		if (index >=length) {//max index is length
 			
-			index = length;
-			length++;
+			length =index+1;
+		  
 		}
 		if (index < 0)
 		{
@@ -244,7 +262,23 @@ namespace dynamicarray {
 
 	}
 
+	template<class T>
+	T& array<T>::at(int index) {
+		//same as [] but only in bounds
+		if (index >= length) {
+			index = length - 1;
+		}
+		if (index < 0)
+		{
+			index = 0;
+		}
 
+
+		
+		return list[index];
+
+
+	}
 
 	
 	template<class T>
@@ -255,7 +289,7 @@ namespace dynamicarray {
 			size = 2 * length + 2;//default case
 		}
 
-		if (size > capacity && size > length)//so it cant be shrunk
+		if (size > capacity)//so it cant be shrunk
 		{
 
 			T* newlist = new T[size];
@@ -268,17 +302,25 @@ namespace dynamicarray {
 
 				return false;
 			}
-			
+			if (list != nullptr)
+			{
 				for (int i = 0; i < length; i++)
 				{
 
 					newlist[i] = list[i];
 				}
-			
-			//also the error here is a bug 
 
+				for (int i = length; i < capacity; i++)
+				{
 
-			delete[] list;
+					newlist[i] = T();
+				}
+				//also the error here is a bug 
+				delete[] list;
+			}
+				
+
+		
 
 			list = newlist;
 
@@ -294,6 +336,11 @@ namespace dynamicarray {
 		length = 0;
 		capacity = size;
 		list = new T[size];
+
+		for (int i = 0; i < size; i++)
+		{
+			list[i] = T();
+		}
 		if (list == nullptr)
 		{
 			delete[] list;
@@ -309,14 +356,8 @@ namespace dynamicarray {
 	template<class T>
 		array<T>::array() {
 			length = 0;
-			capacity = 1;
-			list = new T[1];
-			if (list == nullptr)
-			{
-				delete[] list;
-
-				return;
-			}
+			capacity = 0;
+			list = nullptr;
 
 
 

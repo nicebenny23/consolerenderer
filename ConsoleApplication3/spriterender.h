@@ -1,6 +1,8 @@
 #include "sprite.h"
+#include "shader.h"
 #include "dynamicarray.h"
 #include "vector2.h"
+
 using namespace dynamicarray;
 using namespace sprite;
 #ifndef spriterender_H
@@ -8,7 +10,7 @@ using namespace sprite;
 namespace spriterenderer {
 
 
-	void drawtoscreen(spritec* sprit, bool scalemode, short addcol = 0);
+	void drawtoscreen(spritec* sprit, scalemode scalemode);
 
 
 

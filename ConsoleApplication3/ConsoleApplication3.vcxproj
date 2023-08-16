@@ -86,16 +86,19 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="camera.cpp" />
     <ClCompile Include="Colorinfo.cpp" />
     <ClCompile Include="ConsoleApplication3.cpp" />
     <ClCompile Include="polygon.cpp" />
     <ClCompile Include="random.cpp" />
     <ClCompile Include="Renderer.cpp" />
+    <ClCompile Include="shader.cpp" />
     <ClCompile Include="sprite.cpp" />
     <ClCompile Include="spriterender.cpp" />
     <ClCompile Include="userinput.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="camera.h" />
     <ClInclude Include="oalgorithm.h" />
     <ClInclude Include="boxflt.h" />
     <ClInclude Include="btree.h" />
@@ -114,7 +117,6 @@
     <ClInclude Include="spriterender.h" />
     <ClInclude Include="transfom.h" />
     <ClInclude Include="triangle.h" />
-    <ClInclude Include="triangulate.h" />
     <ClInclude Include="userinput.h" />
     <ClInclude Include="vector2.h" />
   </ItemGroup>

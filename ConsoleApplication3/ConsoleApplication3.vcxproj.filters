@@ -39,6 +39,12 @@
     <ClCompile Include="spriterender.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="camera.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="shader.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Renderer.h">
@@ -89,9 +95,6 @@
     <ClInclude Include="btree.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="triangulate.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="sprite.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -102,6 +105,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="spriterender.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="camera.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
