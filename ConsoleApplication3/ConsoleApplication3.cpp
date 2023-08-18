@@ -24,100 +24,76 @@ using namespace dynamicarray;
 using namespace winutil;
 using namespace pgon;
 using namespace v2;
+const char* file = "fprintf.txt";
+char* sp;
 
-char* num;
+int xdim = 10;
+int ydim = 10;
+const char* namebuf = "10;10;";
+
+int scx = 200;
+int scy = 200;
+int sc2y;
+int sc2x;
+int cnkx;
+int cnky;
+int extd = 0;
+int ifp(Vector2 pnt) {
 
 
-sprite::spritec gp = sprite::spritec("bullet.txt", zerov);
 
-sprite::spritec gd = sprite::spritec("fprintf.txt", zerov);
-
-
-int currspawnbird;
-int bl = 0;
-
-struct bird
-{
-	void movebirdt();
-	int birdin;
-	array<Vector2> locations;
-	float speed;
-	bool alive;
-	spritec spir;
+	pnt += Vector2(sc2x, -sc2y);
+	pnt.x /= cnkx;
+	pnt.y /= -cnky;
 	
-	Vector2 cpos;
-	float pdis;
-	Vector2 wpos;
-	int pct;
-	int timeleft;
-	bird();
-	bird(int basespeed);
-};
-struct wave
-{
-	int amount;
-	int basespeed;
-	int length;
-	int bt;
-
-
-};
-wave amount[] = { wave{4,1,3,34},wave{3,4,6,6},wave{1,0,10,1 } };
-int wavm = sizeof(amount)/sizeof(amount[0]);
-void bird::movebirdt() {
-	
-	if (distance(cpos,wpos)<=speed)
+	if (pnt.x>=0&&pnt.x<xdim)
 	{
-		pct++;
-		
-		wpos = Vector2((random() - .5)*400,random()*300-100);
-		spir.posscale.x = 4;
-		if (wpos.x<spir.pos.x)
-		{
-			spir.posscale.x = -4;
-		}
-		pdis = distance(cpos, wpos);
+		int ind = floor(pnt.x) + xdim * floor(abs(pnt.y));
+		 if (pnt.y >= 0 && pnt.y < ydim)
+		 {
+			 return ind + extd;
+
+		 }
 	}
-	else {
+	
+	
+	
+	return  -1;
+}
 
-		cpos += normal((wpos - cpos))*speed;
-
+void writebuftofile() {
+	char* num;
+	FILE* fp;
+	struct stat fst;
+	
+	fp = fopen(file, "w");
+	if (fp == NULL)
+	{
+		std::exit(-664);
 	}
-	spir.pos = cpos;
+	stat(file, &fst);
 
-
-}
-int currwav;
-bird::bird() {
-	birdin = currspawnbird;
-	
-	spir = sprite::spritec("fprintf.txt", zerov);
-	spir.posscale = Vector2(4,4);
-	cpos = zerov;
-	timeleft = 100;
-	speed = 0;
-	pct = 0;
-	alive = true;
-	pdis = distance(cpos, wpos);
+	fwrite(sp, 1, static_cast<size_t>(xdim) * ydim+extd, fp);
 
 }
-bird::bird(int basespeed) {
-	birdin = currspawnbird;
-	
-	spir = sprite::spritec("fprintf.txt", zerov);
-	spir.posscale = Vector2(-4,4);
-	cpos = zerov;
-	timeleft = 100;
-	speed = basespeed;
-	pct = 0;
-	alive = true; 
-	pdis = distance(cpos, wpos);
-	
-}
-array<bird> birdlist=array<bird>::array();
+int colr = 0;
 int main()
 {
-	currwav = 0;
+	extd = floor(log10(xdim)) + floor(log10(ydim))+4;
+	
+
+	
+
+	sc2x = scx / 2;
+	sc2y = scy / 2;
+	cnkx = scx / xdim;
+	cnky = scy / ydim;
+
+
+	 sp = new char[xdim*ydim+extd];
+	 memcpy(sp, namebuf, extd);
+	 memset(sp+extd, 97, static_cast<size_t>(xdim) * ydim);
+	
 	const HANDLE hOut = GetStdHandle(STD_OUTPUT_HANDLE);
 	const HANDLE hIn = GetStdHandle(STD_INPUT_HANDLE);
 	static COORD screensize = { 800,800 };
@@ -147,144 +123,83 @@ int main()
 	 while (true)
 	 {
 		
-		 // camera::camerapos = Vector2(3, 4 * t);
-		 camera::cscale = Vector2(1, 1);
+	
 		userinput::getinput(hIn);
 		clearscreen();
 		//drawbox(0, -100, 400, 200, 160);
 		 auto a = high_resolution_clock::now();
-		 drawbox(0, -150, 400, 100, 96);
-	
-	//	pipe.render();
-		 
-		  sprite::spritec spid = sprite::spritec("dog.txt", zerov);
-		  spriterenderer::drawtoscreen(&spid, wrap);
-		 if (birdlist.length ==0)
+		 if (userinput::Getkey('d').pressed)
 		 {
-			 if (currwav<wavm)
-			 {
-				 for (int i = 0; i < amount[currwav].amount; i++)
-				 {
-					 birdlist.append(bird(amount[currwav].basespeed));
-				 }
-				 shots = amount[currwav].bt;
-				 bl = amount[currwav].amount;
-				 currwav++;
-				
+			 if (colr < 15) {
+				 colr++;
 			 }
-
 		 }
-		 if (flashtime>0)
+		 if (userinput::Getkey('a').pressed)
 		 {
-			 flashtime--;
-
-			 if (flashtime>9)
-			 {
-				 drawbox(0, 0, 400, 400, 240);
-
+			 if (colr >0) {
+				 colr--;
 			 }
-			 else
-			 {
-				 gp.pos = shotpos;
-				 gp.posscale = unitv * flashtime * flashtime / 12;
-				 spriterenderer::drawtoscreen(&gp, norm);
-
-			 }
-			
 		 }
-		 if (userinput::Getkey('x').pressed) {
-
-
-			 if (flashtime < 1)
-			 {
-				 flashtime = 12;
-				 shots--;
-				 shotpos = userinput::mousestate.pos;
-				 shot = true;
-			 }
-
-			
-			
-		 }
-
-		 for (int i = 0; i < birdlist.length; i++)
+		 if (userinput::Getkey('x').held)
 		 {
+			 int cind = ifp(userinput::mousestate.pos);
+			 if (cind!=-1)
+			 {
+				 sp[cind] = 97+colr;
+			
+			 }
 			 
-			
-			
-				
-				
-				
-				  if (birdlist.getelem(i).spir.inbounds(userinput::mousestate.pos)&& birdlist.at(i).alive==true&&shot)
-				 {
 
-					 birdlist.at(i).alive = false;
-				
-					 bl--;
-				 }
-			
-			 if (birdlist[i].alive)
+		}
+		 if (userinput::Getkey('c').held)
+		 {
+			 int cind = ifp(userinput::mousestate.pos);
+			 if (cind != -1)
 			 {
-				 birdlist[i].movebirdt();
-				 
+				colr= sp[ifp(userinput::mousestate.pos)]- 97 ;
+
 			 }
-			 else {
 
-				 if (birdlist[i].cpos.y< -100) {
-					 birdlist.deleteind(i);
-					
-					 continue;
-				 }
-				 else
-				 {
-					 birdlist[i].spir.pos -= (Vector2(0, 2));
-					 birdlist[i].cpos -= (Vector2(0, 2));
-				 }
+
+		 }
+
+		 if (userinput::Getkey('w').pressed)
+		 {
+			 writebuftofile();
+		 }
+		 int ind = extd;
+		 for (int j = ydim-1; j >=0 ; j--)
+		 {
+		 for (int i = 0; i < xdim; i++)
+		 {
+			 if (sp[ind] == 97) {
+
+				 drawbox(i * cnkx - sc2x + cnkx / 2 + cnkx / 4, j * cnky - sc2y + cnky / 2+ cnky / 4, cnkx / 2, cnky / 2, 80);
+				 drawbox(i * cnkx - sc2x + cnkx / 2-cnkx/4, j * cnky - sc2y + cnky / 2- cnky / 4, cnkx/2, cnky/2,80);
+				 drawbox(i * cnkx - sc2x + cnkx / 2, j * cnky - sc2y + cnky / 2, cnkx, cnky, 160);
+			}
+				 drawbox(i * cnkx - sc2x+cnkx/2, j * cnky - sc2y+ cnky / 2, cnkx, cnky, (sp[ind]-97)<<4);
+				 ind++;
 			 }
-			 spriterenderer::drawtoscreen(&birdlist[i].spir,norm);
-			
-
-		
-
+			 
 		 }
-		 shot = false;
-		 if (shots <= 0 &&bl !=0)
-		 {
-			 return 1;
-		 }
-		
-		 gp.pos = Vector2(160, -200);
-		 gd.pos = Vector2(-150, -150);
-		 gd.posscale = Vector2(bl, 1);
-		 gp.posscale = Vector2(1, 1);
-		 spriterenderer::drawtoscreen(&gd, wrap);
-		 for (int i = 0; i < shots; i++)
-		 {
-		
-			 gp.pos += Vector2(0, 6);
-			
-			
-			 spriterenderer::drawtoscreen(&gp, norm);
-		 }
+		 drawbox(0, 0, 400, 400, 0);
 		 drawframe();
 			 userinput::resetkeys();
 			 auto g= 0;
 			 do
-			 {
-
+			 { 
+				 
 
 				 auto b = high_resolution_clock::now();
 				 g = duration_cast<nanoseconds>(b - a).count();
 			 } while (g < 100000);
 			 
 
-		
 
 			 t += g / static_cast<float>(1'00'000000);
 		 }
-	 
-	
-	
-	return 0;
+
+	 return 0;
 	
 }
