@@ -12,7 +12,7 @@ template<typename T>
 T multidist(safearray<float> probdist,safearray<T> returnval);
 
 
-void init();
+void randominit();
 
 #endif // !random_hpp
 

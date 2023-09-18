@@ -1,7 +1,7 @@
 #include "shader.h"
 
 
- fshader::fshader(void (*shadeinp)(spritec*))
+ fshader::fshader(void (*shadeinp)(sprite*))
 {
 
 	shade = shadeinp;

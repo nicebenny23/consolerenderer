@@ -67,7 +67,19 @@ namespace oalgorithm {
 
 	}
 
-
+	template <typename T>
+	int clamp(T val, int low, int high)
+	{
+		if (val>high)
+		{
+			return high;
+		}
+		if (val<low)
+		{
+			return low;
+		}
+		return val;
+	}
 	template <typename T>
 	int parttion(T* arr, int low, int high)
 	{
@@ -122,7 +134,60 @@ namespace oalgorithm {
 		quicksub(arr, 0, len - 1);
 	}
 
+	
+	template <typename T>
+	int parttionptr(T* arr, int low, int high, bool (*lt)(T, T), bool (*gt)(T, T))
+	{
+		T pivot = arr[int(floor((high + low) / 2))];
+		int leftind = low - 1;
+		int rightind = high + 1;
 
+		while (true)
+		{
+
+			do
+			{
+				leftind++;
+			} while (lt(arr[leftind],pivot));
+			do
+			{
+				rightind--;
+			} while (gt(arr[rightind] , pivot));
+
+			if (!lt(leftind, rightind))
+			{
+				return rightind;
+			}
+			T carry = arr[leftind];
+			arr[leftind] = arr[rightind];
+			arr[rightind] = carry;
+
+		}
+
+	}
+
+
+	template <typename T>
+	void quicksubptr(T* arr, int low, int high, bool (*lt)(T, T), bool (*gt)(T, T)) {
+
+		if (low < high)
+		{
+			int p = parttion(arr, low, high,lt,gt);
+
+			quicksub(arr, low, p, lt, gt);
+			quicksub(arr, p + 1, high, lt, gt);
+		}
+
+
+
+	}
+
+
+
+	template <typename T>
+	void quicksortptr(T* arr, int len,bool (*gt)(T,T),bool (*lt)(T,T)) {
+		quicksub(arr, 0, len - 1,lt,gt);
+	}
 
 
 

@@ -1,45 +1,46 @@
 #include "spriterender.h"
 #include "Renderer.h"
-#include "sprite.h"
+#include "dsprite.h"
 #include "camera.h"
 #include "shader.h"
 #include "oalgorithm.h"
 #include "random.h"
 #include "safearray.h"
-using namespace sprite;
+#include "gameobject.h"
+using namespace spritename;
+using namespace gameobject;
 using namespace spriterenderer;
-array<spritec*> spriterenderer::spritelist;
+array<sprite*> spriterenderer::spritelist;
 
 
 
 float val = 0;
-void spriterenderer::drawtoscreen(spritec* sprit,scalemode drawmode)
+void spriterenderer::drawtoscreen(gameobj sprit,scalemode drawmode)
 {
    
    
-    Vector2 pos = sprit->pos-camera::camerapos;
+    Vector2 pos = sprit.pos-camera::camerapos;
     pos *= camera::cscale;
     bool yflip = false;
     bool xflip = false;
-    Vector2 scales = sprit->posscale*camera::cscale;
-
-    if (scales.x < 0 || scales.y < 0) {
-
+    Vector2 scales = sprit.scale*camera::cscale;
+    Vector2 abscale= scales;
+   
         if (scales.x < 0)
         {
-            scales.x = abs(scales.x);
-            xflip = true;
+            abscale.x = abs(scales.x);
+            
         }
         if (scales.y < 0)
         {
-            scales.y = abs(scales.y);
-            yflip = true;   
+            abscale.y = abs(scales.y);
+             
         }
-    }
+    
    
-    int ydd2 = floor(sprit->file.ydim * scales.y / 2);
-    int xdd2 = floor(sprit->file.xdim * scales.x / 2);
-    int pxscle = ceil(sprit->file.xdim * scales.x);
+    int ydd2 = floor(sprit.sprit.ydim * abscale.y / 2);
+    int xdd2 = floor(sprit.sprit.xdim * abscale.x / 2);
+    int pxscle = ceil(sprit.sprit.xdim * abscale.x);
     int pxlscle = -xdd2;
     int pxrscle = xdd2;
     int pyuscle = ydd2;
@@ -47,7 +48,7 @@ void spriterenderer::drawtoscreen(spritec* sprit,scalemode drawmode)
 
     int sxd2 = ceil(Render::GetDim().x / 2) - 1;
     int syd2 = ceil(Render::GetDim().y / 2) - 1;
-    int pyscle = (sprit->file.ydim * scales.y);
+    int pyscle = (sprit.sprit.ydim * abscale.y);
 
 
   
@@ -95,32 +96,27 @@ void spriterenderer::drawtoscreen(spritec* sprit,scalemode drawmode)
 
 
   
-  
        
-    spritec buf;
+    sprite buf;
     
     if (drawmode == norm)
     {
-
-        buf = scale(*sprit, scales, drawmode);
-
+        sprite d = sprit.sprit;
+ 
+        buf = scale(sprit.sprit, scales, drawmode);
+     
+        int m = 2;
     }
     else
     {
 
-    
-        buf = scale(*sprit, sprit->posscale, drawmode);
+       
+        buf = scale(sprit.sprit, abscale, drawmode);
         buf *= camera::cscale;
        
     }
-    if (yflip)
-    {
-        buf = buf.flipy();
-    }
-    if (xflip)
-    {
-        buf = buf.flipx();
-    }
+  
+    
     char val = 0;
   
     //fliped sprites are drawn backyords
@@ -142,7 +138,7 @@ void spriterenderer::drawtoscreen(spritec* sprit,scalemode drawmode)
 
         for (int i = pxlscle; i != pxrscle; i++)
         {
-            val = buf.file.bufdat[i + ydx + xdd2];
+            val = buf.bufdat[i + ydx + xdd2];
 
             if (val != 0)
             {
@@ -161,22 +157,21 @@ void spriterenderer::drawtoscreen(spritec* sprit,scalemode drawmode)
         }
         yp++;
     }
-    delete[] buf.file.bufdat;
+    delete[] buf.bufdat;
+   
 }
 
 void spriterenderer::render()
 {
-    saferarray::safearray<spritec> arr = saferarray::safearray<spritec>(spritelist.length);
+    saferarray::safearray<sprite> arr = saferarray::safearray<sprite>(spritelist.length);
     for (int i = 0; i < spritelist.length; i++)
     {
         arr[i] = *spritelist[i];
 
     }
-
-    oalgorithm::quicksort<spritec>(arr.getdata(), spritelist.length);
-    for (int i = spritelist.length-1; i >= 0; i--)
+  for (int i = spritelist.length-1; i >= 0; i--)
     {
-        drawtoscreen(&arr[i], norm);
+     
     }
 
 }
@@ -184,5 +179,5 @@ void spriterenderer::render()
 void spriterenderer::renderinit()
 {
 
-    spritelist = array<spritec*>(2);
+    spritelist = array<sprite*>(2);
 }

@@ -88,17 +88,24 @@
   <ItemGroup>
     <ClCompile Include="camera.cpp" />
     <ClCompile Include="Colorinfo.cpp" />
+    <ClCompile Include="component.cpp" />
     <ClCompile Include="ConsoleApplication3.cpp" />
+    <ClCompile Include="gameobject.cpp" />
     <ClCompile Include="polygon.cpp" />
     <ClCompile Include="random.cpp" />
     <ClCompile Include="Renderer.cpp" />
+    <ClCompile Include="screenset.cpp" />
     <ClCompile Include="shader.cpp" />
-    <ClCompile Include="sprite.cpp" />
+    <ClCompile Include="dsprite.cpp" />
     <ClCompile Include="spriterender.cpp" />
     <ClCompile Include="userinput.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="camera.h" />
+    <ClInclude Include="component.h" />
+    <ClInclude Include="gametime.h" />
+    <ClInclude Include="gameobject.h" />
+    <ClInclude Include="queque.h" />
     <ClInclude Include="oalgorithm.h" />
     <ClInclude Include="boxflt.h" />
     <ClInclude Include="btree.h" />
@@ -113,8 +120,9 @@
     <ClInclude Include="screenset.h" />
     <ClInclude Include="Renderer.h" />
     <ClInclude Include="shader.h" />
-    <ClInclude Include="sprite.h" />
+    <ClInclude Include="dsprite.h" />
     <ClInclude Include="spriterender.h" />
+    <ClInclude Include="stack.h" />
     <ClInclude Include="transfom.h" />
     <ClInclude Include="triangle.h" />
     <ClInclude Include="userinput.h" />

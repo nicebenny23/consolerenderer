@@ -16,7 +16,7 @@ namespace Render
 		const extern HANDLE* pHout;
 	
 
-		void createscreen(short startwidth, short startheight, COORD fontsize, const HANDLE* hout);
+		void createscreen(short startwidth, short startheight, COORD fontsize);
 		void drawframe();
 		void setpix(int x, int	y, DWORD col);
 		void settpix(int x, int y, DWORD col, char opacity);

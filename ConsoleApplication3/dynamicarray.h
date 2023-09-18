@@ -18,7 +18,7 @@ namespace dynamicarray {
 		T getelem(int index);
 
 		array(int size);
-		~array();
+		void destroy();
 		T& at(int ind);
 		bool cutind(int startindex, int endindex);
 		array<T>* slice(int startindex, int endindex);
@@ -31,11 +31,11 @@ namespace dynamicarray {
 		T* getdata();
 		array(const array& arr);
 		int length;
-		bool resize(int size = 0);
-	private:
-
-		int capacity;
 		T* list;
+		bool resize(int size = 0);
+	
+		int capacity;
+		
 
 	};
 
@@ -92,7 +92,7 @@ namespace dynamicarray {
 	}
 	
 	template<class T>
-	array<T>::~array() {
+	void array<T>::destroy() {
 		if (list != nullptr&&list) {
 			delete[] list;
 		}
@@ -260,7 +260,7 @@ namespace dynamicarray {
 		return list[index];
 
 
-	}
+   	}
 
 	template<class T>
 	T& array<T>::at(int index) {
@@ -274,7 +274,7 @@ namespace dynamicarray {
 		}
 
 
-		
+		T val = list[index];
 		return list[index];
 
 
@@ -284,11 +284,18 @@ namespace dynamicarray {
 	template<class T>
 	bool array<T>::resize(int size) {
 		//returns if success
+	
+		if (list == nullptr || length == 0)
+		{
+			length = 0;
+			*this = array<T>(2);
+			return true;
+		}
 		if (size == 0)
 		{
 			size = 2 * length + 2;//default case
 		}
-
+		
 		if (size > capacity)//so it cant be shrunk
 		{
 
@@ -302,8 +309,7 @@ namespace dynamicarray {
 
 				return false;
 			}
-			if (list != nullptr)
-			{
+			
 				for (int i = 0; i < length; i++)
 				{
 
@@ -317,7 +323,7 @@ namespace dynamicarray {
 				}
 				//also the error here is a bug 
 				delete[] list;
-			}
+			
 				
 
 		

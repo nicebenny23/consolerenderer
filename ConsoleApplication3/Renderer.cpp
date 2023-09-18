@@ -2,7 +2,7 @@
 #include "Renderer.h"
 #include "Colorinfo.h"
 #include "random.h"
-
+#include "screenset.h"
 namespace Render {
 
 
@@ -16,15 +16,16 @@ COORD Dimval;
 	
 	CHAR_INFO* pixelarray;
 	const HANDLE* pHout;
-	void createscreen(short startwidth, short startheight, COORD fontsize, const HANDLE* hout)
+	void createscreen(short startwidth, short startheight, COORD fontsize)
 	{
 
-	
 
 		 Width = 2 * round(startwidth / (2 * fontsize.X))+1;
-	Height = 2 * round(startheight / (2 * fontsize.Y))+1;
-		 pHout = hout;
-		
+		 Height = 2 * round(startheight / (2 * fontsize.Y)) + 1;
+
+			 pHout = winutil::getouthand();
+	HANDLE a = *pHout;
+
 		 hWidth = (Width / 2);
 			hHeight = (Height / 2);
 			Dim = Vector2(Width, Height);
@@ -33,9 +34,17 @@ COORD Dimval;
 		pixelarray = new CHAR_INFO[Width * Height];
 		clearscreen();
 		cval= (Width * hHeight) + hWidth;
+		for (int i = 0; i < Width * Height; i++)
+		{
+
+			pixelarray[i].Attributes = 0;
+
+			pixelarray[i].Char.AsciiChar = ' ';
+		}
+		
 	}
 
-
+        
 
 
 
@@ -45,23 +54,11 @@ inline	void setpix(const int x, const int y, DWORD col) {
 		
 		if (y <= hHeight && y >= -hHeight&&  x <= hWidth&& x >= -hWidth) {
 			pixelarray[x -(Width * y)+cval ].Attributes =col;
-			
+	
 		}
 	}
 
-void settpix(int x, int y, DWORD col,char opacity)
-{
-	//for lighting and transparency
 
-	int ind = x - (Width * y) + cval;
-	if (y <= hHeight && y >= -hHeight && x <= hWidth && x >= -hWidth) {
-		
-			//find info on this structute
-		pixelarray[ind].Attributes 	=(pixelarray[ind].Attributes*(15 - opacity) + unsafegetpix(x, y) * opacity)/16;
-	
-
-	}
-}
 
 DWORD getpix(int x, int y)
 {
@@ -77,7 +74,7 @@ DWORD getpix(int x, int y)
 DWORD unsafegetpix(int x, int y)
 {
 	
-		return pixelarray[x + cval-Width * y].Attributes;
+	return pixelarray[x + cval - Width * y].Attributes;
 
 	
 }
@@ -92,30 +89,26 @@ void unsafesetpix(int x, int y, DWORD col) {
 }
 
 void clearscreen() {
-
-
-
-
-
-
-	for (int i = 0; i < Width * Height; i++)
+	
+	int wh = Width * Height;
+	for (int i = 0; i < wh; i++)
 	{
-		
+
 		pixelarray[i].Attributes = 0;
 
-		pixelarray[i].Char.UnicodeChar = ' ';
+		
 	}
-
-
 }
+
 void drawframe() {
 
 
 	COORD ScreenBufferCoord = { 0, 0 };
 	SMALL_RECT ConsoleCoord = { 0, 0, Width, Height };
-
 	WriteConsoleOutputA(*pHout, pixelarray, Dimval, ScreenBufferCoord, &ConsoleCoord);
-
+	
+	
+	
  }
 
 
@@ -146,10 +139,9 @@ v2::Vector2 GetDim()
 		{
 			for (short j = voff; j < vpff; j++)
 			{
-				if (getpix(i,j)==0)
-				{
+				
 					setpix(i, j, pixval);
-				}
+				
 				
 			}
 		}

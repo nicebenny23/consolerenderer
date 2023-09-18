@@ -70,10 +70,11 @@ int randomint(float max)
 
     return round(random(max)-.5);
 }
-void init()
+void  randominit()
 {
-
-	val = ((unsigned)(time)(0));
+    
+	val = 2;
+    
 }
 
 

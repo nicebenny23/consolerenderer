@@ -94,6 +94,14 @@ namespace v2
 		p = Vector2(p.x * c - p.y * s, p.x * s + p.y * c);
 		return (p );
 	}
+	inline Vector2 rot(Vector2 p,float mag, float degrees) {
+
+		float c = cos(degrees);
+		float s = sin(degrees);
+
+		return Vector2(c,s)*mag+p;
+		
+	}
 	inline float magnitude(const Vector2& p) {
 
 		return(sqrt(p.x * p.x + p.y * p.y));
