@@ -261,7 +261,10 @@ namespace gameobject {
 
 		}
 		gameobj* obj();
+		gameobjref() {
 
+			int guid = 0;
+		}
 	};
 
 		

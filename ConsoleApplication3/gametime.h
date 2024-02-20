@@ -32,15 +32,15 @@ int currtimer =0;
 
 struct  timer
 {
-	bool hitend;
-	bool fcount;
-	float currtime;
+	bool hitend;//on iff the timer has hit the max amount of time allocated
+	bool fcount;//whether it goes by frame
+	float currtime;//the current time on the timer
 	timer();
 	int timeid;
 	bool on();
 	void dec(float amt);
 	void remove();
-	bool running;
+	bool running;//on iff the timer is running at the molment
 	void start(float time);
 
 };

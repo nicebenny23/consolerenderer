@@ -11,7 +11,7 @@ using namespace gameobject;
 namespace spriterenderer {
 
 
-	void drawtoscreen(gameobj sprit, scalemode scalemode);
+	void drawtoscreen(gameobj& sprit, scalemode scalemode);
 
 
 

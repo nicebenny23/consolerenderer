@@ -37,7 +37,7 @@ void winutil::setcursor() {
 
 
 
-	CONSOLE_SCREEN_BUFFER_INFOEX buf;
+	CONSOLE_SCREEN_BUFFER_INFOEX buf = CONSOLE_SCREEN_BUFFER_INFOEX();
 	buf.cbSize = sizeof(CONSOLE_SCREEN_BUFFER_INFOEX);
 
 	for (int i = 0; i < 16; i++)

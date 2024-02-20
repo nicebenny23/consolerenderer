@@ -72,8 +72,9 @@ int randomint(float max)
 }
 void  randominit()
 {
-    
-	val = 2;
+    int s= time(0);
+  
+	val = s;
     
 }
 

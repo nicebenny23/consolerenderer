@@ -230,6 +230,10 @@ v2::Vector2 GetDim()
 			tri[0] = tri[1];
 			tri[1] = carry;
 		}
+		if (tri[0]==tri[1]&&tri[2]==tri[1])
+		{
+			return;
+		}
 		int x3 =(tri[2].x);
 		int y3 = (tri[2].y);
 		bool firsttri = true;

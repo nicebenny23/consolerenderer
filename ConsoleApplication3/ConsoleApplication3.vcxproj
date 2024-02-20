@@ -86,7 +86,9 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="ant.cpp" />
     <ClCompile Include="camera.cpp" />
+    <ClCompile Include="collision.cpp" />
     <ClCompile Include="Colorinfo.cpp" />
     <ClCompile Include="component.cpp" />
     <ClCompile Include="ConsoleApplication3.cpp" />
@@ -101,10 +103,13 @@
     <ClCompile Include="userinput.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="ant.h" />
     <ClInclude Include="camera.h" />
+    <ClInclude Include="collision.h" />
     <ClInclude Include="component.h" />
     <ClInclude Include="gametime.h" />
     <ClInclude Include="gameobject.h" />
+    <ClInclude Include="mathc.h" />
     <ClInclude Include="queque.h" />
     <ClInclude Include="oalgorithm.h" />
     <ClInclude Include="boxflt.h" />

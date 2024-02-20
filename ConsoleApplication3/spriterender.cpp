@@ -15,7 +15,7 @@ array<sprite*> spriterenderer::spritelist;
 
 
 float val = 0;
-void spriterenderer::drawtoscreen(gameobj sprit,scalemode drawmode)
+void spriterenderer::drawtoscreen(gameobj& sprit,scalemode drawmode)
 {
    
    

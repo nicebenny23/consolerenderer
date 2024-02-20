@@ -86,6 +86,19 @@ namespace v2
 		p = Vector2(p.x * c - p.y * s, p.x * s + p.y * c);
 		return (p + p1);
 	}
+	
+	inline float angx(Vector2 p, const Vector2 p1) {
+
+
+		return atan2(p.y-p1.y,p.x- p1.x);
+		
+	}
+
+	inline Vector2 intv(Vector2 p) {
+
+		return Vector2(floor(p.x), floor(p.y));
+	}
+
 	inline Vector2 rot( Vector2 p,float degrees) {
 
 		float c = cos(degrees);
@@ -102,15 +115,31 @@ namespace v2
 		return Vector2(c,s)*mag+p;
 		
 	}
+	
+	inline bool Vector2::operator==(const Vector2& p1)
+	{
+		return (p1.x == x && p1.y == y);
+
+	}
+
+	
 	inline float magnitude(const Vector2& p) {
 
 		return(sqrt(p.x * p.x + p.y * p.y));
 	}
-
-	inline Vector2 normal(const Vector2& p) {
-
+	inline Vector2 normal(Vector2 p) {
+		if (p==zerov)
+		{
+		
+		}
 		return(p / magnitude(p));
 	}
+	inline Vector2 clampmag(Vector2 p,float max) {
+
+
+		return normal(p) * min(magnitude(p), max);
+	}
+
 
 	inline float dotproduct(const Vector2& p, const Vector2& p1) {
 
@@ -209,7 +238,7 @@ namespace v2
 
 			float lerpval = (point.y - end.y) / (start.y - end.y);
 
-			if (lerpval * start.x + (1 - lerpval) * end.x <= point.x)
+			if (lerpval * start.x + (1 - lerpval) * end.x < point.x)
 			{
 				return true;
 			}
@@ -331,6 +360,52 @@ namespace v2
 		return false;
 	}
 
+	inline Vector2 closestpointonline(Vector2 point, Vector2 l1, Vector2 l2) {
+		if (l1.x==l2.x)
+		{
+			return Vector2(l1.x, point.y);
+		}if (l2.y == l1.y)
+		{
+			return Vector2(point.x,l1.y);
+		}
+		
+		float s = slope(l1, l2);
+		float is = 1/s;
+		float xv = (point.y + (point.x) * is - l2.y+s*l2.x)/(s+is);
+
+		return Vector2(xv, s * xv + l2.y - l2.x * s);
+	}
+	inline	bool pointupline(Vector2 point, Vector2 l1, Vector2 l2) {
+		bool flip = false;
+		if (l2.x < l1.x)
+		{
+			flip = true;
+		}
+		if (l1.x == l2.x)
+		{
+			if (point.x > l1.x)
+			{
+				return true;
+			}
+			return false;
+		}if (l2.y == l1.y)
+		{
+			if (point.y > l1.y)
+			{
+				return true;
+			}
+			return false;
+		}
+		float s = slope(l1, l2);
+
+		Vector2 p2 = Vector2(point.x, l2.y - s * l2.x + s * point.x);
+		bool res = (point.y > p2.y);
+		if (res^flip)
+		{
+			return true;
+		}
+		return false;
+	}
 	
 	inline bool horozontalray(Vector2 a, Vector2 c, Vector2 d, Vector2* loc) {
 
@@ -402,11 +477,7 @@ namespace v2
 		x = X;
 		y = Y;
 	}
-	inline bool Vector2::operator==(const Vector2& p1)
-	{
-		return (p1.x == x && p1.y == y);
-
-	}
+	
 	inline bool Vector2::operator!=(const Vector2& p1)
 	{
 		return(p1.x != x || p1.y != y);

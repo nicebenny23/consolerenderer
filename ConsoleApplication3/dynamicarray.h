@@ -14,14 +14,16 @@ namespace dynamicarray {
 	public:
 
 		array();
+		array(T* arr,int size);
 		T& operator[](int index);
 		T getelem(int index);
 
 		array(int size);
 		void destroy();
 		T& at(int ind);
+		void append(array arr);
 		bool cutind(int startindex, int endindex);
-		array<T>* slice(int startindex, int endindex);
+		void slice(int startindex, int endindex);
 		void insertind(int index, T value);
 		void merge(int index, const array& arr);
 		bool deleteind(int index);
@@ -93,7 +95,7 @@ namespace dynamicarray {
 	
 	template<class T>
 	void array<T>::destroy() {
-		if (list != nullptr&&list) {
+		if (list != nullptr) {
 			delete[] list;
 		}
 	}
@@ -106,12 +108,15 @@ namespace dynamicarray {
 	}
 
 	template<class T>
-	array<T>* array<T>::slice(int startindex, int endindex) {
+	void array<T>::slice(int startindex, int endindex) {
 
 
-		array<T>* arr = array<T>::array(*this);
-		arr->cutind(startindex, endindex);
-		return &arr;
+		
+		this->cutind(endindex+1, length-1);
+		this->cutind(0,startindex-1);
+
+		int v = 1;
+		return;
 	}
 
 	template<class T>
@@ -167,31 +172,41 @@ namespace dynamicarray {
 	template<class T>
 	bool array<T>::cutind(int startindex,int endindex) {
 		 
+		if (endindex < startindex)
+		{
+			int car = endindex;
+			endindex = startindex;
+			startindex = car;
+		}
 		if (startindex<0)
 		{
-			startindex = 0;
+			return false;
 		}
 		if (endindex>=length)
 		{
-			endindex = length - 1;
+			return false;
 		}//bounds checking
-		if (endindex>=startindex)//sees if in bounds
-		{
+		
 			int dif = endindex - startindex;   
-			for (int i =endindex; i <=length; i++)
+			
+			
+			for (int i =endindex+1; i <length; i++)
 			{
 				
-				
-				list[i-dif] = list[i];//this lets index be removed
-				list[i] = T();//sets to defualt
+
+
+				list[i- dif-1] = list[i];
+				int g = 1;
+
 			}
 			
 			
 			length-=dif+1;
-		}
-
-
+			return true;
 	}
+
+		
+	
 
 	
 
@@ -280,6 +295,23 @@ namespace dynamicarray {
 
 	}
 
+	template<class T>
+	void array<T>::append( array arr) {
+	
+		
+		int otherlength = arr.length;
+		if (length + otherlength >= capacity)
+		{
+			resize(2 * (length + otherlength) + 2);
+		}
+
+	
+		for (int i = 0; i < otherlength; i++)
+		{
+			list[i +length] = arr.list[i];
+		}
+		length += otherlength;
+	}
 	
 	template<class T>
 	bool array<T>::resize(int size) {
@@ -367,6 +399,27 @@ namespace dynamicarray {
 
 
 
+
+
+		}
+
+		template<class T>
+		inline array<T>::array(T* arr,int size)
+		{
+			length = size;
+			capacity = size;
+			list = new T[size];
+
+			for (int i = 0; i < size; i++)
+			{
+				list[i] =arr[i];
+			}
+			if (list == nullptr)
+			{
+				delete[] list;
+
+				return;
+			}
 
 
 		}

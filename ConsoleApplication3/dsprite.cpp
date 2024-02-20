@@ -340,6 +340,7 @@ void sprite::sprite::operator*=(Vector2 scalev)
 
 sprite::sprite(const char* fpath, Vector2 dim) 
 {
+   
     spritefileload(fpath, *this);
 
     this->pos = zerov;

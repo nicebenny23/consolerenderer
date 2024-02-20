@@ -68,7 +68,7 @@ namespace oalgorithm {
 	}
 
 	template <typename T>
-	int clamp(T val, int low, int high)
+	T clamp(T val, int low, int high)
 	{
 		if (val>high)
 		{

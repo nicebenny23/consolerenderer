@@ -15,7 +15,7 @@ public:
 	triangle(Vector2 a, Vector2 b, Vector2 c);
 	triangle();
 	void changetriangle(int index, Vector2 point);
-
+	void sortbyheight();
 
 
 
@@ -112,6 +112,29 @@ inline void triangle::changetriangle(int index, Vector2 point) {
 
 	vertices[index] = point;
 
+}
+
+inline void triangle::sortbyheight()
+{
+	Vector2 carry = Vector2(0, 0);
+	if (vertices[1].y > vertices[2].y)
+	{
+		carry = vertices[1];
+		vertices[1] = vertices[2];
+		vertices[2] = carry;
+	}
+	if (vertices[0].y > vertices[2].y)
+	{
+		carry = vertices[0];
+		vertices[0] = vertices[2];
+		vertices[2] = carry;
+	}
+	if (vertices[0].y > vertices[1].y)
+	{
+		carry = vertices[0];
+		vertices[0] = vertices[1];
+		vertices[1] = carry;
+	}
 }
 
 inline Vector2& triangle::operator[](int index)

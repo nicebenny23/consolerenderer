@@ -12,7 +12,7 @@ using namespace spritename;
 using namespace gameobject;
 
 
-
+//todo make my own hashmap
 std::unordered_map<char*, int> gameobject::stringtoint;
 int gameobject::curid;
 
@@ -46,13 +46,13 @@ array<gameobj*> objectfromguid;
 
 int getgoid()
 {
-	int randomvalg = randomint(400);
+	int randomvalg = randomint(8000);
 	gameobj* valifexist = objectfromguid[randomvalg];
 
 	
 	while (valifexist!= 0 )
 	{
-		randomvalg= randomint(400);
+		randomvalg= randomint(8000);
 		valifexist = objectfromguid[randomvalg];
 	
 	}
@@ -71,7 +71,7 @@ array<gameobj*> initobj;
 int s = 3;
 void gameobject::initobjs() {
 	
-	objectfromguid = array<gameobj*>(400);
+	objectfromguid = array<gameobj*>(8000);
 	delobjs = array<gameobj*>();
 	initobj = array<gameobj*>();
 
@@ -176,10 +176,14 @@ void gameobject::deleteobjs()
 		delete delobjs[ind];
 
 	}
-	delobjs.destroy();
+	if (delobjs.length>0)
+	{
+		delobjs.destroy();
 	delobjs.length = 0;
 	delobjs = array<gameobj*>();
 
+	}
+	
 }
 
 
