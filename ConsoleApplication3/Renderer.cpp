@@ -102,7 +102,7 @@ void clearscreen() {
 
 void drawframe() {
 
-
+	
 	COORD ScreenBufferCoord = { 0, 0 };
 	SMALL_RECT ConsoleCoord = { 0, 0, Width, Height };
 	WriteConsoleOutputA(*pHout, pixelarray, Dimval, ScreenBufferCoord, &ConsoleCoord);
@@ -183,7 +183,7 @@ v2::Vector2 GetDim()
 			prevy = y;
 
 
-			//d.setpix(val + px, -val1 +py, pixelColor);
+			
 		}
 
 

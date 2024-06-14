@@ -2,84 +2,15 @@
 #include "Renderer.h"
 #include "dynamicarray.h"
 #include "boxflt.h"
-
+#include <cmath>
+#include "userinput.h"
+#include "debug.h"
 using namespace dynamicarray;
 array<collider*> collist;
-///<summary>
-///computes all colisions and runs collision updates
-///</summary>
-void checkcol() {
-	array<box> boundingboxlist;
-	for (int i = 0; i < collist.length; i++)
-	{
-		boundingboxlist.append(box(collist[i]->poly, collist[i]->holder->pos));
 
-	}
-	array<array<polygon>> pollist=array<array<polygon>>();
-	for (int i = 0; i < collist.length; i++)
-	{
-		pollist.append(convexdecomp(collist[i]->poly));
-	}
-
-
-	for (int i = 0; i < collist.length; i++)
-	{
-		Vector2 pos = collist[i]->holder->pos;
-		collist[i]->poly.polypos = pos;
-		collist[i]->poly.drawout(3, 160);
-		for (int j = i; j < collist.length; j++)
-		{
-			if (i != j) {
-				if (boundingboxlist[i].intersect(boundingboxlist[j]))
-				{
-				
-
-					int s = pollist[i].length;
-					for (int z = 0;z < pollist[i].length;z++) {
-						for (int x=0;x<pollist[j].length;x++)
-						{
-							
-
-					Vector2 force = computecoll(pollist[j][x], pollist[i][z],collist[j]->holder->pos,collist[i]->holder->pos);
-
-							collist[i]->holder->pos -= force;
-							collist[j]->holder->pos += force ;
-							}
-					}
-				}
-
-			}
-		}
-	}
-	for (int i = 0; i < pollist.length; i++)
-	{
-		for (int j = 0; j < pollist[i].length; j++)
-		{
-			pollist[i][j].pointlist.destroy();
-		}
-		pollist[i].destroy();
-	}
-	pollist.destroy();
-	
-}
-///<summary>
-///starts collision
-///</summary>
-void initcol()
+void initcollisionsystem()
 {
 	collist = array<collider*>();
-
-}
-
-collider::collider(polygon basepoly)
-{
-	ind = collist.length;
-	collist.append(this);
-
-
-	poly.polypos = zerov;
-	poly.pointlist = basepoly.pointlist;
-	      
 
 }
 
@@ -87,18 +18,24 @@ collider::collider()
 {
 	ind = collist.length;
 	collist.append(this);
-	Vector2 dpoint[] = { Vector2(-10,-10),Vector2(-30,10),Vector2(20,10), Vector2(-5,-20)};
-	poly.pointlist = array<Vector2>(dpoint,4);
+	Vector2 dpoint[] = { Vector2(0,0), Vector2(0,50), Vector2(30,30),Vector2(30,50),Vector2(33,50),Vector2(33,0) };
+	poly.pointlist = array<Vector2>(dpoint, 6);
+
 }
+
+collider::collider(polygon basepoly)
+{
+	ind = collist.length;
+	collist.append(this);
+	poly.pos = zerov;
+	poly.pointlist = basepoly.pointlist;
+
+}
+
+
 
 void collider::update()
 {
-	
-	 for (int i = 0; i < poly.pointlist.length; i++)
-	 {
-		 Vector2 d = poly[i];
-		 int g = 2;
-	 }
 }
 
 void collider::ondestroy()
@@ -109,176 +46,257 @@ void collider::ondestroy()
 
 
 
-///<summary>
-///does the casework for the collision intervals
-///</summary>
-Vector2 collcasework(Vector2 pmax, Vector2 pmin, Vector2 p1max, Vector2 p1min) {
+void checkcol() {
 
-	if (pmax.x < p1max.x)
+	array<circle> circlelist;
+	for (int i = 0; i < collist.length; i++)
 	{
-		if (pmax.x < p1min.x) {
-
-			//no intersection
-			return zerov;
-		}
-
-		if (pmax.x > p1min.x)
+		circlelist.append(circle());
+		circlelist[i].center=centerofmass(collist[i]->poly);
+		for (int vertexwalk= 0; vertexwalk < collist[i]->poly.length(); vertexwalk++)
 		{
-			//when p is at least in p1
-
-
-			if (p1min.x > pmin.x)
-			{
-				//p is not fully in p1
-				return  (pmax - p1min);
-
-
-
-			}
-
-			if (p1min.x < pmin.x)
-			{
-				//when p1 is fully in p
-
-				//thse 2 find smallest diffrence
-				if ((p1max - pmin).x < (pmax - p1min).x)
-				{
-
-					return p1max - p1min;
-
-				}
-				else
-				{
-
-					return  p1max - pmin;
-
-				}
-
-
-			}
-
-
-
+			circlelist[i].radius = max(circlelist[i].radius, distance(circlelist[i].center,collist[i]->poly[vertexwalk]));
 		}
 	}
-	return zerov;
-}
-///<summary>
-///computes a displacment vector with only one polygons vertices being taken into account
-///</summary>
-Vector2 computeonecoll(polygon& a, polygon& b,Vector2 pos1,Vector2 pos2)
-{
 
 
 
-	int p1l = a.pointlist.length;//pointlist1length
-	float mag2 = 10000;//actual magnatude
-	Vector2 colforce = zerov;//colision vector
-
-	for (int i = 0; i < p1l; i++)//goes through each line
+	array<array<polygon>> decomposedlist = array<array<polygon>>();
+	for (int i = 0; i < collist.length; i++)
 	{
-		int i1 = i;//first index for line
-
-		int i2 = (i + 1) % p1l;//second index for line
-
-		Vector2 p1 = a[i1];//first point on line
-		Vector2 p2 = a[i2];//secont point
-		Vector2 p3 = zerov;//orthogonal line
-		if (slope(p1, p2) == 0)//zero slope case
+		array<polygon> decomposed = convexdecomp(collist[i]->poly);
+		if(DEBUG_COLLISION)
+		for (int j = 0; j < decomposed.length; j++)
 		{
-
-			p3 = Vector2(p1.x + 0.001, p1.y + 1);//calculating veritcal line
+			decomposed[j].pos = collist[i]->poly.pos;
+	        decomposed[j].drawout(1, 176);
+	        decomposed[j].pos = zerov;
 		}
-		else {
+		decomposedlist.append(decomposed);
+	}
 
 
-
-			p3 = Vector2(p1.x - 1, p1.y + 1 / slope(p1, p2));//computing the orthigonal vector
-		}
-
-		Vector2 pmax = Vector2(-INFINITY, 0);//
-		Vector2 pmin = Vector2(INFINITY, 0);
-		Vector2  p1max = Vector2(-INFINITY, 0);
-		Vector2 p1min = Vector2(INFINITY, 0);
-		for (int j = 0; j < b.pointlist.length; j++)
-		{
-			Vector2 pointonline = closestpointonline(b[j] + pos2, p1, p3);//projected to a line
-
-			if (pointonline.x < pmin.x)
-			{
-				pmin = pointonline;
-			}
-			if (pointonline.x > pmax.x)
-			{
-				pmax = pointonline;
-			}
-		}
-		for (int j = 0; j < p1l; j++)
-		{
-			Vector2 pointonline = closestpointonline(a[j] + pos1, p1, p3);
-
-			if (pointonline.x < p1min.x)
-			{
-				p1min = pointonline;
-			}
-			if (pointonline.x > p1max.x)
-			{
-				p1max = pointonline;
-			}
-		}
 	
-		Vector2 curcforce1 = zerov;//temperary force
-
-		//orientation caswork when p1 goes further than p
-		
-			//orientation caswork when p goes further than p1
-			if (p1max.x > pmax.x)
-			{
-				curcforce1 = collcasework(pmax, pmin, p1max, p1min);
-			}
-			else
-			{
-
+	for (int attempts = 0; attempts < coliterations; attempts++)
+	{
+		for (int i = 0; i < collist.length; i++)
+		{
 			
-				curcforce1 = collcasework(p1max, p1min, pmax, pmin)*-1;
+			collist[i]->poly.pos += (collist[i]->holder->pos - collist[i]->storepos) / coliterations;
+
+		}
+		for (int i = 0; i < collist.length; i++)
+		{
+			for (int j = i; j < collist.length; j++)
+			{
+				if (i != j) {
+					Vector2 totalseperatingvector = zerov;
+							for (int i1= 0;i1< decomposedlist[i].length;i1++)
+							{
+								for (int j1 = 0;j1 < decomposedlist[j].length;j1++) {
+									Vector2 force = computecoll(decomposedlist[i][i1], decomposedlist[j][j1], collist[i]->poly.pos, collist[j]->poly.pos);
+									totalseperatingvector += force;
+									collist[i]->poly.pos += force / 2;
+									collist[j]->poly.pos -= force / 2;
+									if (DEBUG_COLLISION)
+									{
+										Render::drawlinet(zerov, force * coliterations, 1, 208);
+									}
+								}
+
+							}	
+							//applycollision(collist[i], collist[j]);
+						
+				          }
 			}
-
-			if (magnitude(curcforce1) < mag2) {
-				mag2 = magnitude(curcforce1);
-				colforce = curcforce1;
-
-			}
-
-		
+		}
+	}
+	for (int i = 0; i < collist.length; i++)
+	{
+		collist[i]->storepos = collist[i]->poly.pos;
+		collist[i]->holder->pos = collist[i]->poly.pos;
 	}
 
-	return colforce;
 
-}
-///<summary>
-///computes a displacment vector between 2 polygons
-///</summary>
+
+	for (int i = 0; i < decomposedlist.length; i++)
+	{
+
+		for (int j = 0; j < decomposedlist[i].length; j++)
+		{
+					(decomposedlist[i][j]).destroy();
+		}
+		decomposedlist[i].destroy();
+	}
+		decomposedlist.destroy();
+
+	}
+
+
+
+
+
 Vector2 computecoll(polygon& a, polygon& b, Vector2 pos1, Vector2 pos2)
 {
 
 
 	//seting position to zero 
-	a.polypos = zerov;
 
-	b.polypos = zerov;
 	Vector2 first = computeonecoll(a, b, pos1, pos2);
 	Vector2 second = computeonecoll(b, a, pos2, pos1);
-	a.polypos = pos1;
 
-	b.polypos = pos2;
-	if (magnitude(first) > magnitude(second))
+	if (magnitude(first) < magnitude(second))
 	{
-		return second * -1;
+		return first;
 	}
 	else
 	{
-		return first;
-	
+		return second * -1;
 	}
 
+
 }
+
+
+///<summary>
+///computes a displacment vector with only one polygons vertices being taken into account
+///</summary>
+Vector2 computeonecoll(polygon& a, polygon& b,Vector2 pos1,Vector2 pos2)
+{
+	
+	int alength = a.pointlist.length;//pointlist1length
+	float mtvmag = INFINITY;//magnatude of mtv
+	Vector2 mimimaltranslationvector = zerov;//colision vector
+
+	for (int i = 0; i < alength; i++)//goes through each line
+	{
+		
+		if (mtvmag==0)
+		{
+			break;
+		}
+		
+		Vector2 p1 = a[i];//first point on line
+		Vector2 p2 = a[(i + 1) % alength];//secont point
+		Vector2 p3 = zerov;//orthogonal line
+		if (slope(p1, p2) == 0)//zero slope case
+		{
+
+			p3 = Vector2(p1.x + 0.0001, p1.y + 1);//calculating veritcal line
+		}
+		else {
+
+			p3 = Vector2(p1.x - 1, p1.y + 1 / slope(p1, p2));//computing the orthigonal vector
+		}
+		   
+
+		Vector2 pmax = Vector2(-INFINITY, 0);
+		Vector2 pmin = Vector2(INFINITY, 0);
+		Vector2  p1max = Vector2(-INFINITY, 0);
+		Vector2 p1min = Vector2(INFINITY, 0);
+		bool sideminmax=false;
+		for (int j = 0; j < alength; j++)
+		{
+			Vector2 pointonline = closestpointonline(a[j] + pos1, p1, p3);
+			if (pointonline.x >= pmax.x)
+			{
+				if (j==i)
+				{
+					sideminmax = true;
+				}
+				pmax = pointonline;
+			}
+			if (pointonline.x < pmin.x)
+			{
+				pmin = pointonline;
+				
+			}
+			
+		}
+		for (int j = 0; j < b.pointlist.length; j++)
+		{
+			Vector2 pointonline = closestpointonline(b[j] + pos2, p1, p3);//projected to a line
+
+			if (pointonline.x > p1max.x)
+			{
+				p1max = pointonline;
+				
+			}
+			if (pointonline.x < p1min.x)
+			{
+				p1min = pointonline;
+				
+			}
+		
+		}
+	
+
+		Vector2 mindirectionalforce = zerov;//temperary force
+
+			if (pmax.x > p1max.x)
+			{
+				mindirectionalforce = collcasework(pmax, pmin, p1max, p1min,sideminmax);
+			}
+			else
+			{
+				mindirectionalforce = collcasework(p1max, p1min, pmax, pmin,!sideminmax) * -1;
+			}
+		
+			if (magnitude(mindirectionalforce) < mtvmag	) {
+				mtvmag = magnitude(mindirectionalforce);
+				mimimaltranslationvector = mindirectionalforce;
+
+			}
+		
+		
+	}
+
+	return mimimaltranslationvector;
+	
+}
+///<summary>
+///computes casework for sat intervals
+///</summary>
+Vector2 collcasework(Vector2 pmax, Vector2 pmin, Vector2 p1max, Vector2 p1min, bool way) {
+
+
+	if (p1max.x <= pmin.x) {
+
+		//no intersection
+		return zerov;
+	}
+	else
+	{
+
+		//when p is at least in p1
+		if (pmin.x > p1min.x)
+		{
+			//p is not fully in p1
+			return  (p1max - pmin);
+
+
+
+		}
+
+		if (pmin.x <= p1min.x)
+		{
+			//when p1 is fully in p
+
+			//probobly right but just guessed
+			if (way)
+			{
+				return  (p1min - pmax);
+			}
+			else
+			{
+				return  (p1max - pmin);
+			}
+
+		}
+
+
+
+	}
+
+ 
+} 

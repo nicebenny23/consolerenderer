@@ -18,7 +18,7 @@
 #include "random.h"
 #include "safearray.h"
 #include "camera.h"
-
+#include "debug.h"
 #include "spriterender.h"
 #include "gameobject.h"
 using namespace spritename;
@@ -45,7 +45,7 @@ static COORD screensize = { 800,800 };
 static COORD ftsize = { 2,2 };
 
 
-void mainsetup() {
+void enginesetup() {
 
 	inittime();
 	randominit();
@@ -54,58 +54,94 @@ void mainsetup() {
 	initobjs();
 	userinput::initiate();
 	initgravgrid();
-	initcol();
+	initcollisionsystem();
 	camera::init();
 }
 
 int birdamount;
 int main()
 {
-	birdamount = 0;
-	mainsetup();
+	debug::reset();
+	std::string string = "debugging:         ";
+	debug::writestring(string);
+	Vector2 a[] = { Vector2(-3, 0), Vector2(-3, 3), Vector2(0,0)};
 
+
+
+
+	enginesetup();
+	int l = 0;
+
+	gameobjref dd =gameinit(Vector2(-0,-3), unitv, "fprintf.txt", "col1test");
 	
-	gameobjref dd =gameinit(zerov,unitv,"fprintf.txt","col1test");
-	gameobjref dda = gameinit(zerov, unitv, "fprintf.txt", "col1test");
-
-
+	Vector2 movepos = zerov;
+	gameobjref ddc = gameinit(Vector2(-100,-150), unitv, "fprintf.txt", "col1test");
 	timer flashtime = timer::timer();
 	dd.obj()->addcomponent<collider>();
-	dda.obj()->addcomponent<collider>();
+	ddc.obj()->addcomponent<collider>(polygon(a,3));
 
-	 while (true)
+	while (true)
 	 {
-		 if (userinput::Getkey('m').held)
-		 {
-		//	 camera::camerapos += userinput::mousestate.pos / 100;
-
-		 }
-		 else
-		 {
-			
-		 }
+		
+		
+	
+		
 		 camera::cscale = Vector2(1,1);
 		userinput::getinput(hIn);
-		clearscreen();
-	
-		if (userinput::Getkey('g').held&&dd.obj()!=nullptr)
+		if (userinput::Getkey('t').pressed)
 		{
-			dd.obj()->pos = userinput::mousestate.pos;
+			l = 0;
+			ddc.obj()->pos = Vector2(0, 0);
+		}
+		clearscreen();
+		
+		if (dd.obj() != nullptr)
+		{
+			movepos.x *= .81;
+			movepos.y *= .81;
+			if(userinput::Getkey('a').held)
+			{
+				movepos -= Vector2(4, 0);
+			}
+			if (userinput::Getkey('d').held)
+			{
+				movepos += Vector2(4, 0);
+			}if (userinput::Getkey('w').held)
+			{
+				movepos.y +=4;
+			}
+		if (userinput::Getkey('s').held)
+		{
+			movepos.y -=4;
+		}
+			
+			
+				dd.obj()->pos +=movepos/4;
+			
+			
+			
+		}
+		if (lineinter(Vector2(3,3), Vector2(5,3),Vector2(3,3),Vector2(5,3)))
+		{
+			drawbox(0, 0, 60, 40, 16);
+				drawbox(0, 0, fps, 40, 80);
 		}
 	
 		
-		
-	
+		drawbox(0, 0, 5, fps, 160);
 		runupdateloop();
+
 		checkcol();
 		deleteobjs();
 		
-		drawbox(0, 0, 5, 5, 160);
 		
-		 drawframe();
-			
-			 
+		
+		
+		
+		drawframe();
+		
 			 calcfps();
+
 			 calctimers();
 			userinput::resetkeys();
 		

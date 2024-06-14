@@ -4,6 +4,13 @@
 
 HANDLE buf2;
 HANDLE hin;
+//enables fullscreen
+void fullscreen() {
+	
+	ShowWindow(GetConsoleWindow(), SW_MAXIMIZE);
+}
+
+//disables varios console fetures to make ity more like a renderer
 void winutil::setmode(HANDLE hin) {
 
 	DWORD modes = ~(ENABLE_LINE_INPUT | ENABLE_ECHO_INPUT | ENABLE_QUICK_EDIT_MODE) | ENABLE_WINDOW_INPUT | ENABLE_MOUSE_INPUT | ENABLE_EXTENDED_FLAGS | ENABLE_VIRTUAL_TERMINAL_PROCESSING;
@@ -11,7 +18,7 @@ void winutil::setmode(HANDLE hin) {
 	SetConsoleMode(hin, modes);
 
 }
-
+//makes cursor work more like in a game 
 void winutil::setcursor() {
 	CONSOLE_CURSOR_INFO con;
 
@@ -21,7 +28,7 @@ void winutil::setcursor() {
 	SetConsoleCursorInfo(buf2, &con);
 	ShowCursor(false);
 }
-
+//gets the ouptut handle
  HANDLE* winutil::getouthand()
 {
 
@@ -65,14 +72,16 @@ void winutil::setcursor() {
 	buf.srWindow = { 0,0,short(charsize.X),short(charsize.Y) };
 
 	SetConsoleScreenBufferInfoEx(buf2, &buf);
-	HANDLE j = buf2;
 	SetConsoleActiveScreenBuffer(buf2);
+	
 	setfont(fonts);
 	setmode(hin);
 	setcursor();
 	SetConsoleTitleA("console render");
-}
+	//fullscreen();
+ }
  
+ //sets used font
  void winutil::setfont(COORD size) {
 	_CONSOLE_FONT_INFOEX font;
 	GetCurrentConsoleFontEx(buf2, false, &font);
@@ -85,3 +94,8 @@ void winutil::setcursor() {
 
 	SetCurrentConsoleFontEx(buf2, FALSE, &font);
 }
+
+ void getsize() {
+
+
+ }

@@ -92,7 +92,7 @@ namespace dynamicarray {
 		}
 
 	}
-	
+	//deletes content of list(not pointers!!)
 	template<class T>
 	void array<T>::destroy() {
 		if (list != nullptr) {
@@ -106,19 +106,58 @@ namespace dynamicarray {
 		//unsafe do not use unless needed
 		return list;
 	}
-
+	
+	
+	//keeps a range of indices including start and end ind,todo add inclusive exculsive toggle
 	template<class T>
 	void array<T>::slice(int startindex, int endindex) {
 
 
-		
-		this->cutind(endindex+1, length-1);
-		this->cutind(0,startindex-1);
+		if (endindex < startindex)
+		{
+			std::swap(startindex, endindex);
+		}
+		if (startindex < 0 || endindex >= length)
+		{
+			return;
+		}
+		//moves indices 
+		for (int i =startindex; i <= endindex; i++)
+		{
+			list[i-startindex] = list[i];
+		}
 
-		int v = 1;
-		return;
+// setting length to area remaining
+		length =endindex - startindex + 1;
+
+return ;
+
+	}
+	//removes a range of indexes,including start/end ind
+	template<class T>
+	bool array<T>::cutind(int startindex, int endindex) {
+
+		if (endindex < startindex)
+		{
+			std::swap(startindex, endindex);
+		}
+		if (startindex < 0 || endindex >= length)
+		{
+			return false;
+		}
+		int dif = endindex - startindex;
+
+		for (int i = endindex + 1; i < length; i++)
+		{
+			list[i - dif - 1] = list[i];
+		}
+
+
+		length -= dif + 1;
+		return true;
 	}
 
+	//copies an array
 	template<class T>
 	array<T>::array(const array& arr) {
 		length = arr.length;
@@ -137,6 +176,7 @@ namespace dynamicarray {
 		}
 
 	}
+	//copies and appends an element to the list(!!!issues with pointers!!!)
 	template<class T>
 	void array<T>::append(T value) {
 		if (length>=capacity)//sees if wee need more memory due to not enogh space
@@ -169,42 +209,7 @@ namespace dynamicarray {
 		return false;
 		
 	}
-	template<class T>
-	bool array<T>::cutind(int startindex,int endindex) {
-		 
-		if (endindex < startindex)
-		{
-			int car = endindex;
-			endindex = startindex;
-			startindex = car;
-		}
-		if (startindex<0)
-		{
-			return false;
-		}
-		if (endindex>=length)
-		{
-			return false;
-		}//bounds checking
-		
-			int dif = endindex - startindex;   
-			
-			
-			for (int i =endindex+1; i <length; i++)
-			{
-				
-
-
-				list[i- dif-1] = list[i];
-				int g = 1;
-
-			}
-			
-			
-			length-=dif+1;
-			return true;
-	}
-
+	
 		
 	
 
@@ -242,7 +247,7 @@ namespace dynamicarray {
 		}
 		length++;//increment
 	}
-
+	//returns alias to index
 	template<class T>
 	T& array<T>::operator[](int index) {
 
@@ -276,10 +281,9 @@ namespace dynamicarray {
 
 
    	}
-
+	//same as [] but only in bounds
 	template<class T>
 	T& array<T>::at(int index) {
-		//same as [] but only in bounds
 		if (index >= length) {
 			index = length - 1;
 		}
@@ -287,14 +291,14 @@ namespace dynamicarray {
 		{
 			index = 0;
 		}
-
+		
 
 		T val = list[index];
 		return list[index];
 
 
 	}
-
+	//appends a list to the end of the list(doesent delete it)(!!!caution with pointer lists!!!)
 	template<class T>
 	void array<T>::append( array arr) {
 	
@@ -312,7 +316,8 @@ namespace dynamicarray {
 		}
 		length += otherlength;
 	}
-	
+	//resizes the array
+
 	template<class T>
 	bool array<T>::resize(int size) {
 		//returns if success

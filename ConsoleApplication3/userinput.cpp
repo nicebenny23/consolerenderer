@@ -20,14 +20,7 @@ inpututil::inputkey& userinput::Getkey(char keyval)
     return keylist[static_cast<size_t>(keyval)];
 }
 
-inpututil::inputkey& userinput::Getkeyc(char keyval)
-{
-    if (keyval < 0 || keyval >= 256)
-        return keylist[0];
-    if (keyval >= 'A' && keyval <= 'Z')
-        keyval += 32;
-    return keylist[static_cast<size_t>(keyval)];
-}
+\
 
 void userinput::getinput(HANDLE hin)
 {
@@ -52,7 +45,7 @@ void userinput::getinput(HANDLE hin)
                 }
                 else if (event.EventType == MOUSE_EVENT)
                 {
-                    mousestate.pos = v2::Coordtovector(event.Event.MouseEvent.dwMousePosition)-v2::Vector2(200,-200) ;
+                    mousestate.pos = v2::Coordtovector(event.Event.MouseEvent.dwMousePosition)+v2::Vector2(-Render::GetDim().x/2, Render::GetDim().y / 2);
                 }
             }
         }

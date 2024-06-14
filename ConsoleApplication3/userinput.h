@@ -12,7 +12,7 @@ namespace userinput {
 	extern inpututil::mouseinputstruct mousestate;
 	extern DWORD newinputs;
 	inpututil::inputkey& Getkey(char keyval);
-	inpututil::inputkey &Getkeyc(char keyval);
+	
 	void resetkeys();
 	void initiate();
 	

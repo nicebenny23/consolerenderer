@@ -2,6 +2,7 @@
 #include "Renderer.h"
 #include "random.h"
 #include "quack.h"
+#include "debug.h"
 #include "mathc.h"
 using namespace pgon;
 
@@ -10,11 +11,27 @@ using namespace pgon;
 ///<summary>
 /// the sign can tell whether points are clockwise or counter clockwize
 ///</summary>
+
 bool rotorder(Vector2 a, Vector2 b, Vector2 c) {
 	int ans = (b.y - a.y) * (c.x - b.x) - (b.x - a.x) * (c.y - b.y);
+	//collinearity!= concavity
 	return  ans >= 0;
 }
+bool imprecisepointinpolygon(Vector2 point, polygon& poly)
+{
 
+	bool parity = false;
+
+	for (int i = 0; i < poly.pointlist.length - 1; i++) {
+
+		parity ^= v2::impreciseleftofline(point, poly[i], poly[i + 1]);
+	}
+
+	parity ^= v2::impreciseleftofline(point, poly[poly.length() - 1], poly[0]);
+
+	return parity;
+
+}
 Vector2 pgon::centerofmass(polygon poly)
 {
 	/*if (poly.pointlist.length == 0)
@@ -59,7 +76,29 @@ pgon::polygon::polygon() {
 
 
 }
-bool lineinpolygon2(polygon poly, Vector2 start, Vector2 end)
+bool pgon::basicintersect(polygon& a, polygon& b)
+{
+	//if false can tbe in interior
+	if (imprecisepointinpolygon(a[0], b))
+	{
+		return true;
+	}
+	for (int i = 0; i < a.length(); i++)
+	{
+		
+		for (int j = 0;j < b.length();j++) {
+			if (lineinter(a[i],a[mod(i+1,a.length())], b[j], b[mod(j + 1, b.length())],false,false))
+			{
+				return true;
+			}
+
+
+		}
+	}
+	
+	return false;
+}
+bool lineinpolygon2(polygon poly, Vector2 start, Vector2 end,bool countiflineisonpolygon =false)
 {
 
 
@@ -67,19 +106,23 @@ bool lineinpolygon2(polygon poly, Vector2 start, Vector2 end)
 
 			if (poly[i]!=start&& poly[i] != end)
 			{
-				if (lineinter(start, end, poly[i], poly[(i + 1)%poly.pointlist.length]))
+				//dont know if correct
+				if (poly[(i + 1) % poly.pointlist.length] != start && poly[(i + 1) % poly.pointlist.length] != end)
 				{
-					return false;
+					//
+					if (lineinter(start, end, poly[i], poly[(i + 1) % poly.pointlist.length]),countiflineisonpolygon)
+					{
+						return false;
+					}
 				}
+			
 			}
 		
 		}
-		if (!pointinpolygon((start + end) / 2, poly))
+		if (pointinpolygon((start + end) / 2, poly,!countiflineisonpolygon))
 		{
-			return false;
+			return true;
 		}
-		return true;
-	
 	return false;
 }
 bool pgon::lineinpolygon(polygon poly, Vector2 start, Vector2 end)
@@ -104,10 +147,11 @@ bool pgon::lineinpolygon(polygon poly, Vector2 start, Vector2 end)
 	}
 	return false;
 }
+//copes existing polygon
 pgon::polygon::polygon(const polygon& poly): pointlist(poly.pointlist)
 {
 
-	polypos = zerov;
+	pos = zerov;
 	
 }
 
@@ -133,9 +177,9 @@ array<array<int>> pgon::trilisttoint(array<int> trilist)
 	return pollist;
 }
 
-Vector2 pgon::polygon::operator[](int index)
+inline Vector2 pgon::polygon::operator[](int index)
 {
-	return pointlist[index] + polypos;
+	return pointlist[index] + pos;
 }
 
 
@@ -149,7 +193,9 @@ void pgon::polygon::append(v2::Vector2 val) {
 	pointlist.append(val);
 
 }
-bool pgon::pointinpolygon(Vector2 point, polygon poly)
+//determanes whether a point is in a polygon(
+// inpolygonifonsides determanes whether a point on the sides of a polygon counts as being in the polygon uses position
+bool pgon::pointinpolygon(Vector2 point, polygon& poly,bool inpolygonifonsides)
 {
 
 
@@ -157,49 +203,24 @@ bool pgon::pointinpolygon(Vector2 point, polygon poly)
 	bool parity = false;
 
 	for (int i = 0; i < poly.pointlist.length - 1; i++) {
-		parity ^= v2::leftofline(point, poly.pointlist[i], poly.pointlist[i + 1]);
+		if (poly.pointlist[i]==point)
+		{
+			return true;
+		}
+		parity ^= v2::leftofline(point, poly.pointlist[i], poly.pointlist[i + 1], inpolygonifonsides);
+	}	
+	if (inpolygonifonsides&& poly.pointlist[poly.length()-1] == point)
+	{
+		return true;
 	}
-	parity ^= v2::leftofline(point, poly.pointlist[0], poly.pointlist[poly.pointlist.length - 1]);
+	parity ^= v2::leftofline(point, poly.pointlist[0], poly.pointlist[poly.length() - 1], inpolygonifonsides);
 
 	return parity;
-	/*
-	short wind = 0;
-
-
-	for (int i = 0; i < poly.pointlist.length; i++)
-	{
-		if (poly[i].y <= point.y)
-		{
-
-
-			if (point.y<poly[(i + 1) % (poly.pointlist.length)].y)
-			{
-				if (badleftofline(point, poly[i], poly[(i + 1) % (poly.pointlist.length)]))
-				{
-					wind++;
-				}
-			}
-		}
-		else
-		{
-
-				if ( poly[(i + 1) % poly.pointlist.length].y<=point.y)
-				{
-					if (badrightofline(point, poly[i], poly[(i + 1) % (poly.pointlist.length)]))
-					{
-						wind--;
-					}
-				}
-
-
-		}
-	}
-	return wind !=0;
-	*/
 
 
 
 }
+
 float pgon::area(polygon poly) {
 	//uses shoelase formula
 	float val = 0;
@@ -219,12 +240,12 @@ void pgon::polygon::drawout(int thickness, COLORREF pixelvalue)
 	{
 
 
-		Render::drawthickcircle(pointlist[0].x + polypos.x, pointlist[0].y + polypos.y, thickness, pixelvalue);
+		Render::drawthickcircle(pointlist[0].x + pos.x, pointlist[0].y + pos.y, thickness, pixelvalue);
 		for (int i = 0; i < pointlist.length; i++)
 		{
-			Render::drawthickcircle(pointlist[(i + 1) % len].x + polypos.x, pointlist[(i + 1) % len].y + polypos.y, thickness, pixelvalue);
+			Render::drawthickcircle(pointlist[(i + 1) % len].x + pos.x, pointlist[(i + 1) % len].y + pos.y, thickness, pixelvalue);
 
-			Render::drawlinet(pointlist[i] + polypos, pointlist[(i + 1) % len] + polypos, thickness, pixelvalue);
+			Render::drawlinet(pointlist[i] + pos, pointlist[(i + 1) % len] + pos, thickness, pixelvalue);
 
 		}
 	}
@@ -263,37 +284,6 @@ array<int> pgon::numbtri(polygon poly) {
 	list.append(2);
 	return list;
 
-}
-
-array<triangle> pgon::triangulate(polygon poly) {
-	int len = poly.pointlist.length;
-	array<triangle> list = array<triangle>(len - 2);
-	int i = 1;
-	while (len > 3)
-	{
-
-
-
-		if (!lineinpolygon(poly, poly[(i - 1) % len], poly[(i + 1) % len]))
-		{
-
-			list.append(triangle(poly[(i - 1) % len], poly[(i)], poly[(i + 1) % len]));
-
-			poly.pointlist.deleteind(i);
-			len--;
-
-		}
-		i += 1;
-		if (i >= len)
-		{
-			i = 1;
-		}
-
-
-	}
-	list.append(triangle(poly[0], poly[1], poly[2]));
-	return list;
-	
 }
 
 
@@ -362,157 +352,127 @@ array<triangle> pgon::triangulate(polygon poly) {
 
 		return polygon();
 	}
-polygon pgon::convexhull(polygon poly2)
-{
-	polygon poly = polygon(poly2);
-	Vector2 pntloc = poly.polypos;
-	poly.polypos = zerov;
-	int lvind = 1;
-	Vector2 lv = Vector2(FLT_MAX, 0);
-	for (int i = 0;i < poly.pointlist.length;i++) {
 
-		if (poly[i].x<lv.x)
-		{
-			lvind = i;
-			lv = poly[i];
-		}if (poly[i].x == lv.x)
-		{
-			if (poly[i].y < lv.y)
-			{
-				lvind = i;
-				lv = poly[i];
-			}
-		}
+	int vdist(int i, int  j, int len) {
 
+		return min(abs(i - j), len - abs ( i - j));
 	}
-
-Vector2 v[] = {lv};
-Vector2 newpoint=lv;
-
-array<int> visit= array<int>();
-
-
-
-
-for (int i = 0; i < poly.pointlist.length; i++)
-{
-	visit[i] = -1;
-}
-
-visit[lvind] = 1;
-	polygon newpol = polygon(v,1);
-	do {
-
-		int delind=-1;
-		Vector2 pnt;
-		polygon polylist = poly;
-		bool valid = false;
-			for (int i = 0; i < poly.pointlist.length; i++) {
-				if (newpoint!= poly[i])
-				{
-
-
-					if (rotorder(newpoint, pnt, poly[i]))
-					{
-						valid = true;
-					}
-					if (delind == -1 || rotorder(newpoint, pnt, poly[i])) {
-						pnt = poly[i];
-						delind = i;
-					}
-				}
-			}
-			
-			if (!valid)
-			{
-				polylist.pointlist.destroy();
-
-				break;
-			}
-			if (visit[delind]==-1)
-			{
-				visit[delind] = 0;
-				newpol.pointlist.append(pnt);
-				newpoint = pnt;
-				polylist.pointlist.destroy();
-			}
-			else {
-				polylist.pointlist.destroy();
-			
-				break;
-			}
-	} while (true);
-	
-	poly.polypos = pntloc;
-	visit.destroy();
-	return newpol;
-}
-
 ///<summary>
 ///decomposes a polygon into convex ones
 ///</summary>
-array<polygon> pgon::convexdecomp(polygon poly)
-{
-	
-	int pntlen = poly.pointlist.length;
-	
-	for (int i = 0; i < pntlen; i++)
+	array<polygon> pgon::convexdecomp(polygon poly)
 	{
-		if (rotorder(poly[mod((i - 1), pntlen)],poly[i],poly[mod((i + 1), pntlen)]) == false)
+	
+		int pntlen = poly.pointlist.length;
+		//first cycle of verices
+		for (int i = 0; i < pntlen; i++)
 		{
+			//checks if oriented incorrectly
+			if (rotorder(poly[mod((i - 1), pntlen)], poly[i], poly[mod((i + 1), pntlen)]) == false)
+			{
 
-			array<polygon> conarr = array <polygon>();
-			int farind = i;
-			bool findconvpoint = false;
-			for (int j = 0;j < pntlen;j++) {
-				if (i != j)
-				{
-					//todo working polygon convex tests for all polygons so i need reverse case implemented
-					bool check1 = rotorder(poly[j], poly[i], poly[mod((i + 1), pntlen)]);
-					bool check2 = (rotorder(poly[mod((i - 1), pntlen)], poly[i], poly[j]));
-							
-								if (check1==check2) {
-									if (abs(i - j) > abs(farind - i) && lineinpolygon2(poly, poly[i], poly[j]))
-									{
-										findconvpoint = true;
-										farind = j;
-									}  
-								}
-								else if (findconvpoint==false)
-								{
+				array<polygon> conarr = array <polygon>();
+				//furtheest index satifyigng the conditions found
+				int farind = i;
+				//working point satisfies at leas one of 2 of convexities
+				bool foundhalfconvexpoint = false;
+				//convex point satisies both
+				bool foundconvpoint = false;
+				//found a point which will removes some convecities
 
+				for (int j = 0;j < pntlen;j++) {
 
-									if (abs(i - j) > abs(farind - i) && lineinpolygon2(poly, poly[i], poly[j]))
-									{
-										farind = j;
-									}
-
-								}
+					int l = vdist(i, j, pntlen);
 					
-				
+					if (vdist(i,j,pntlen)>1)
+					{
+						//todo make counteclockwize work;
+						//sees if polygon can be split to remove  concavities 
+						bool check1 = rotorder(poly[j], poly[i], poly[mod((i + 1), pntlen)]);
+						bool check2 = (rotorder(poly[mod((i - 1), pntlen)], poly[i], poly[j]));
+
+
+
+						if (check1 == check2 ||(!foundconvpoint &&(check1^check2))) {
+							if (lineinpolygon2(poly, poly[i], poly[j])) {
+
+								if ( !foundhalfconvexpoint)
+								{
+									
+									farind = j;
+									foundhalfconvexpoint = true;
+
+								}
+								
+								if ((vdist(i, j, pntlen) > vdist(i, farind, pntlen)) ||( (check1 == check2) && !foundconvpoint)) {
+									farind = j;
+									if ((check1 == check2))
+									{
+										foundconvpoint = true;
+									}
+								}
+								
+								
+								
+							}
+						}
+						
+
+
+					}
 				}
-				
-			}
 
-			polygon con2 = poly;
-				con2.pointlist.cutind(i + 1, farind - 1);
-				polygon con1 = poly;
-			
+
+				polygon poly1 = poly;
+				//slices polygon into 2 diffrent parts
+				//contained part
+				poly1.pointlist.slice(i, farind);
+
+				polygon poly2 = poly;
+				//slices polygon into 2 diffrent parts
+				poly2.pointlist.cutind(mod(min(i,farind)+1, poly.pointlist.length), mod(max(farind ,i)-1, poly.pointlist.length));
+
+
 				array<polygon> output = array<polygon>();
-				con1.pointlist.slice(i, farind);
-				output = convexdecomp(con2);
-				
-				output.append(convexdecomp(con1));
-				
-				return output;
-			
-			}
-		
-	}
-	array<polygon> output = array<polygon>();
+				array<polygon> decomposed1 = convexdecomp(poly1);
+				array<polygon> decomposed2 = convexdecomp(poly2);
+				output.append(decomposed1);
+				output.append(decomposed2);
 
-	output[0]=(poly);
+
+				decomposed1.destroy();
+				decomposed2.destroy();
+			
+				return output;
+			}
+		}
+		
+		array<polygon> output = array<polygon>();
+		output.append(poly);
+		poly.pointlist.destroy();
+		if (DEBUG)
+		{
+			debug::writestring("	");
+			for (int u = 0; u < output[0].length(); u++)
+			{
+				debug::writestring(vectostring(output[0][u]));
+			}
+		}
+		
+		return output;
+		
 	
+	}
 	
-	return output;
-}
+	int pgon::findindexofpoint(polygon& poly, int startsearch, Vector2 point)
+	{
+		for (int i = 0; i < poly.length(); i++)
+		{
+			int ind = mod(startsearch + i, poly.length());
+			if (poly[ind]==point)
+			{
+				return ind;
+			}
+		}
+		return -1;
+	}
